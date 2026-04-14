@@ -6,20 +6,17 @@
 //
 
 import Foundation
-
 import SwiftData
 
 @Model
 final class Budget {
-    var id: UUID
-    var username: String
-    var email: String
-    var password: String
+    var total: Double
+    var categoryBudgets: [String: Double]
+    var remainingBalance: Double //may or may not need
 
-    init(username: String, email: String, password: String) {
-        self.id = UUID()
-        self.username = username
-        self.email = email
-        self.password = password
+    init(total: Double, categoryBudgets: [String: Double], remainingBalance: Double) {
+        self.total = total
+        self.categoryBudgets = categoryBudgets
+        self.remainingBalance = remainingBalance
     }
 }
