@@ -6,3 +6,19 @@
 //
 
 import Foundation
+import SwiftData
+
+@Model
+final class Expense {
+    var amount: Int
+    var category: String
+    var date: Date
+    var note: String
+
+    init(amount: Int, category: String, date: Date, note: String) {
+        self.amount = amount
+        self.category = category
+        self.date = date
+        self.note = note
+    }
+}
