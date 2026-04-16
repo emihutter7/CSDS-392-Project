@@ -9,60 +9,53 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
-    @State private var showSignOut = false
+    @State private var selectedTab = 0
     
     var body: some View {
-        NavigationStack {
-            Text("Welcome!")
-            Spacer()
-            
-            
-            }
-        .navigationDestination(isPresented: $showSignOut) {
-                        SignOutView()
-                    }
-        .toolbar {
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
+        TabView(selection: $selectedTab) {
+            HomeView()
+                .tabItem {
                     Image(systemName: "house.fill")
-                        .resizable()
-                        .scaledToFit()
+                    Text("Home")
                 }
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
+                .tag(0)
+            
+            ExpenseHistoryView()
+                .tabItem {
                     Image("ExpensesIcon")
-                        .resizable()
-                        .scaledToFit()
+                        .renderingMode(.template)
+                    Text("Expenses")
                 }
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
+                .tag(1)
+            
+            AddExpenseView()
+                .tabItem {
                     Image(systemName: "square.and.pencil")
-                        .resizable()
-                        .scaledToFit()
+                    Text("Add")
                 }
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
+                .tag(2)
+            
+            ReportsView()
+                .tabItem {
                     Image("ReportsIcon")
-                        .resizable()
-                        .scaledToFit()
+                        .renderingMode(.template)
+                    Text("Reports")
                 }
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button(action: {
-                    showSignOut = true
-                }) {
+                .tag(3)
+            
+            SettingsView()
+                .tabItem {
                     Image(systemName: "gearshape.fill")
-                        .resizable()
-                        .scaledToFit()
+                    Text("Settings")
                 }
-            }
+                .tag(4)
         }
+        
         .padding()
     }
 }
+
+
 
 #Preview {
     ContentView()
