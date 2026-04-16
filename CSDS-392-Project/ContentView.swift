@@ -50,7 +50,8 @@ struct ContentView: View {
                 }
                 .tag(4)
         }
-
+        .tint(Color.green)
+        .padding()
     }
 }
 

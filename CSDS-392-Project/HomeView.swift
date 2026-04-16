@@ -8,8 +8,16 @@ import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        Text("Home Screen")
+        ScrollView {
+            VStack (spacing: 40){
+                Text("Home")
                     .font(.largeTitle)
+                SummaryCard(total: 2000, spent: 1000)
+                    .frame(maxWidth: .infinity)
+                
+            }
+            .padding()
+        }
     }
 }
 
