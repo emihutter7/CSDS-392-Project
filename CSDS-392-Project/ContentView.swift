@@ -22,7 +22,7 @@ struct ContentView: View {
             
             ExpenseHistoryView()
                 .tabItem {
-                    Image("ExpensesIcon")
+                    Image(systemName: "dollarsign.circle")
                         .renderingMode(.template)
                     Text("Expenses")
                 }
@@ -37,7 +37,7 @@ struct ContentView: View {
             
             ReportsView()
                 .tabItem {
-                    Image("ReportsIcon")
+                    Image(systemName: "chart.bar")
                         .renderingMode(.template)
                     Text("Reports")
                 }
@@ -50,8 +50,7 @@ struct ContentView: View {
                 }
                 .tag(4)
         }
-        
-        .padding()
+
     }
 }
 
