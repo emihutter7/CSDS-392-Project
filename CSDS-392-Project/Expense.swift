@@ -10,12 +10,20 @@ import SwiftData
 
 @Model
 final class Expense {
-    var amount: Int
+    var title: String
+    var amount: Double
     var category: String
     var date: Date
     var note: String
 
-    init(amount: Int, category: String, date: Date, note: String) {
+    init(
+        title: String,
+        amount: Double,
+        category: String,
+        date: Date = Date(),
+        note: String = ""
+    ) {
+        self.title = title
         self.amount = amount
         self.category = category
         self.date = date

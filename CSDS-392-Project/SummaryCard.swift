@@ -7,29 +7,41 @@
 import SwiftUI
 
 struct SummaryCard: View {
-    let total: Int
-    let spent: Int
-    
-    var remaining: Int { total - spent }
-    
+    let total: Double
+    let spent: Double
+
+    private var remaining: Double {
+        total - spent
+    }
+
+    private var progress: Double {
+        guard total > 0 else { return 0 }
+        return min(spent / total, 1.0)
+    }
+
     var body: some View {
-        VStack (spacing: 6) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Monthly Summary")
-                .font(.headline)
+                .font(.title2)
                 .fontWeight(.semibold)
-            Text("Total: $\(total)")
-            Text("Spent: $\(spent)")
-            Text("Remaining: $\(remaining)")
-            
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Total: \(total, format: .currency(code: "USD"))")
+                Text("Spent: \(spent, format: .currency(code: "USD"))")
+                Text("Remaining: \(remaining, format: .currency(code: "USD"))")
+            }
+            .font(.title3)
+
+            ProgressView(value: progress)
+                .progressViewStyle(.linear)
         }
-        .font(.body)
-        .padding(30)
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y:2)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
 #Preview {
-    SummaryCard(total: 2000, spent: 1000)
+    SummaryCard(total: 0, spent: 0)
 }

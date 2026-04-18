@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
     @State private var selectedTab = 0
-    
+
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
@@ -19,30 +19,28 @@ struct ContentView: View {
                     Text("Home")
                 }
                 .tag(0)
-            
+
             ExpenseHistoryView()
                 .tabItem {
                     Image(systemName: "dollarsign.circle")
-                        .renderingMode(.template)
                     Text("Expenses")
                 }
                 .tag(1)
-            
+
             AddExpenseView()
                 .tabItem {
                     Image(systemName: "square.and.pencil")
                     Text("Add")
                 }
                 .tag(2)
-            
+
             ReportsView()
                 .tabItem {
                     Image(systemName: "chart.bar")
-                        .renderingMode(.template)
                     Text("Reports")
                 }
                 .tag(3)
-            
+
             SettingsView()
                 .tabItem {
                     Image(systemName: "gearshape.fill")
@@ -50,11 +48,9 @@ struct ContentView: View {
                 }
                 .tag(4)
         }
-        .tint(Color.green)
-        .padding()
+        .tint(.green)
     }
 }
-
 
 
 #Preview {

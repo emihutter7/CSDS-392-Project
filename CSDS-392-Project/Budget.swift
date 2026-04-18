@@ -11,15 +11,9 @@ import SwiftData
 
 @Model
 final class Budget {
-    var id: UUID
-    var username: String
-    var email: String
-    var password: String
+    var monthlyLimit: Double
 
-    init(username: String, email: String, password: String) {
-        self.id = UUID()
-        self.username = username
-        self.email = email
-        self.password = password
+    init(monthlyLimit: Double = 2000) {
+        self.monthlyLimit = monthlyLimit
     }
 }
