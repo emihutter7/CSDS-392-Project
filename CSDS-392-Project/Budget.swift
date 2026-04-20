@@ -11,9 +11,11 @@ import SwiftData
 
 @Model
 final class Budget {
-    var monthlyLimit: Double
+    var income: Double
+    var incomePeriod: String
 
-    init(monthlyLimit: Double = 2000) {
-        self.monthlyLimit = monthlyLimit
+    init(income: Double = 0, incomePeriod: String = "Monthly") {
+        self.income = income
+        self.incomePeriod = incomePeriod
     }
 }

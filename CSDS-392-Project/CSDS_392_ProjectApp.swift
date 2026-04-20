@@ -33,6 +33,6 @@ struct CSDS_392_ProjectApp: App {
             }
             .environment(authModel)
         }
-        .modelContainer(for: [Expense.self, Budget.self])
+        .modelContainer(for: [Expense.self, Budget.self, CategoryBudget.self])
     }
 }

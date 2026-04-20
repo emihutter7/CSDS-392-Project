@@ -11,7 +11,7 @@ struct SummaryCard: View {
     let spent: Double
 
     private var remaining: Double {
-        total - spent
+        max(total - spent, 0)
     }
 
     private var progress: Double {
@@ -20,25 +20,38 @@ struct SummaryCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Monthly Summary")
-                .font(.title2)
-                .fontWeight(.semibold)
+        VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("Total Budget:")
+                    Spacer()
+                    Text(total.formatted(.currency(code: "USD")))
+                }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Total: \(total, format: .currency(code: "USD"))")
-                Text("Spent: \(spent, format: .currency(code: "USD"))")
-                Text("Remaining: \(remaining, format: .currency(code: "USD"))")
+                HStack {
+                    Text("Spent:")
+                    Spacer()
+                    Text(spent.formatted(.currency(code: "USD")))
+                }
+
+                HStack {
+                    Text("Remaining:")
+                    Spacer()
+                    Text(remaining.formatted(.currency(code: "USD")))
+                }
             }
-            .font(.title3)
+            .font(.system(size: 20, weight: .medium))
+            .foregroundStyle(.white)
 
             ProgressView(value: progress)
                 .progressViewStyle(.linear)
+                .tint(.blue)
+                .scaleEffect(y: 1.6)
         }
-        .padding(24)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 22)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .background(Color.clear)
     }
 }
 
