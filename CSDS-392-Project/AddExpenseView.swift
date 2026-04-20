@@ -19,153 +19,140 @@ struct AddExpenseView: View {
 
     private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
 
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
     var body: some View {
         ZStack {
-            Color(red: 0.80, green: 0.68, blue: 0.40)
-                .ignoresSafeArea()
+            backgroundColor.ignoresSafeArea()
 
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
+
                     Text("Add Expense")
-                        .font(.system(size: 30, weight: .medium))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 10)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Title")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundStyle(.white)
+                    VStack(spacing: 18) {
 
-                        TextField("Title", text: $title)
-                            .padding(.horizontal, 14)
-                            .frame(width: 280, height: 48)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
+                        inputField("Title", text: $title)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Category")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundStyle(.white)
-
-                        Picker("Category", selection: $category) {
-                            ForEach(categories, id: \.self) { item in
-                                Text(item).tag(item)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .padding(.horizontal, 12)
-                        .frame(width: 170, height: 42)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Date")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundStyle(.white)
+                        PickerField(
+                            label: "Category",
+                            selection: $category,
+                            options: categories
+                        )
 
                         DatePicker(
-                            "",
+                            "Date",
                             selection: $date,
                             displayedComponents: [.date, .hourAndMinute]
                         )
-                        .labelsHidden()
-                        .tint(.blue)
-                    }
+                        .datePickerStyle(.compact)
+                        .tint(accentColor)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Amount")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundStyle(.white)
+                        inputField("Amount", text: $amount, keyboard: .decimalPad)
 
-                        TextField("Value", text: $amount)
-                            .keyboardType(.decimalPad)
-                            .padding(.horizontal, 14)
-                            .frame(width: 280, height: 48)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
-
-                    VStack(alignment: .leading, spacing: 10) {
                         TextEditor(text: $note)
-                            .frame(width: 280, height: 130)
-                            .padding(10)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color.black.opacity(0.15), lineWidth: 1)
-                            )
+                            .frame(height: 130)
+                            .padding(12)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 18)
+                                    .stroke(fieldBorder, lineWidth: 1.5)
+                            }
                             .overlay(alignment: .topLeading) {
                                 if note.isEmpty {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Notes (Optional)")
-                                            .foregroundStyle(.gray)
-                                        Text("...")
-                                            .foregroundStyle(.gray)
-                                    }
-                                    .padding(.top, 18)
-                                    .padding(.leading, 16)
+                                    Text("Notes (Optional)")
+                                        .foregroundStyle(secondaryAccent.opacity(0.45))
+                                        .padding(.top, 18)
+                                        .padding(.leading, 16)
                                 }
                             }
+
                     }
+                    .padding(20)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
 
                     Button {
                         saveExpense()
                     } label: {
                         Text("Add Expense")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundStyle(.purple)
-                            .padding(.horizontal, 28)
-                            .padding(.vertical, 10)
-                            .background(.white.opacity(0.95))
-                            .clipShape(Capsule())
-                            .shadow(radius: 2, y: 1)
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(accentColor)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 18)
 
                     if showSavedMessage {
                         Text("Expense saved")
-                            .foregroundStyle(.white)
+                            .foregroundStyle(secondaryAccent)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
 
                     Spacer(minLength: 100)
                 }
-                .padding(.horizontal, 28)
-                .padding(.top, 8)
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
             }
         }
     }
 
-    private func saveExpense() {
-        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func inputField(_ label: String, text: Binding<String>, keyboard: UIKeyboardType = .default) -> some View {
+        TextField(label, text: text)
+            .keyboardType(keyboard)
+            .foregroundStyle(secondaryAccent)
+            .padding(.horizontal, 14)
+            .frame(height: 52)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(fieldBorder, lineWidth: 1.5)
+            }
+    }
 
-        guard !trimmedTitle.isEmpty,
-              let amountValue = Double(amount) else {
-            return
+    private func PickerField(label: String, selection: Binding<String>, options: [String]) -> some View {
+        Picker(label, selection: selection) {
+            ForEach(options, id: \.self) { item in
+                Text(item).tag(item)
+            }
         }
+        .pickerStyle(.menu)
+        .padding(.horizontal, 14)
+        .frame(height: 52)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(fieldBorder, lineWidth: 1.5)
+        }
+    }
 
-        let newExpense = Expense(
-            title: trimmedTitle,
+    private func saveExpense() {
+        guard let amountValue = Double(amount),
+              !title.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+
+        modelContext.insert(Expense(
+            title: title,
             amount: amountValue,
             category: category,
             date: date,
-            note: trimmedNote
-        )
-
-        modelContext.insert(newExpense)
+            note: note
+        ))
 
         title = ""
-        category = "Food"
-        date = Date()
         amount = ""
         note = ""
-
         showSavedMessage = true
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

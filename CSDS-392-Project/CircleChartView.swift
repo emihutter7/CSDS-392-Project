@@ -11,24 +11,31 @@ struct CircleChartView: View {
     let values: [Double]
     let lineWidth: CGFloat
 
+    private let chartColors: [Color] = [
+        Color(red: 0.75, green: 0.55, blue: 0.60),
+        Color(red: 0.55, green: 0.43, blue: 0.35),
+        Color(red: 0.88, green: 0.80, blue: 0.81),
+        Color(red: 0.83, green: 0.70, blue: 0.73),
+        Color(red: 0.91, green: 0.86, blue: 0.84)
+    ]
+
     private var total: Double {
         values.reduce(0, +)
     }
 
     var body: some View {
         ZStack {
-            if total == 0 {
-                Circle()
-                    .trim(from: 0, to: 1)
-                    .stroke(Color.black.opacity(0.25), style: StrokeStyle(lineWidth: lineWidth))
-            } else {
+            Circle()
+                .stroke(Color(red: 0.93, green: 0.89, blue: 0.88), lineWidth: lineWidth)
+
+            if total > 0 {
                 let angles = normalizedSegments(values: values)
 
                 ForEach(Array(angles.enumerated()), id: \.offset) { index, segment in
                     Circle()
                         .trim(from: segment.start, to: segment.end)
                         .stroke(
-                            Color.black,
+                            chartColors[index % chartColors.count],
                             style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt)
                         )
                         .rotationEffect(.degrees(-90))
@@ -57,4 +64,6 @@ struct CircleChartView: View {
 
 #Preview {
     CircleChartView(values: [100, 200, 300, 400, 500], lineWidth: 10)
+        .padding()
+        .background(Color(red: 0.97, green: 0.95, blue: 0.94))
 }

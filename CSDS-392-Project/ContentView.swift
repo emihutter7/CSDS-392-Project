@@ -11,47 +11,58 @@ struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
     @State private var selectedTab = 0
 
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
-                .tag(0)
+            NavigationStack {
+                HomeView()
+            }
+            .tabItem {
+                Image(systemName: "house.fill")
+                Text("Home")
+            }
+            .tag(0)
 
-            ExpenseHistoryView()
-                .tabItem {
-                    Image(systemName: "dollarsign.circle")
-                    Text("Expenses")
-                }
-                .tag(1)
+            NavigationStack {
+                ExpenseHistoryView()
+            }
+            .tabItem {
+                Image(systemName: "dollarsign.circle")
+                Text("Expenses")
+            }
+            .tag(1)
 
-            AddExpenseView()
-                .tabItem {
-                    Image(systemName: "square.and.pencil")
-                    Text("Add")
-                }
-                .tag(2)
+            NavigationStack {
+                AddExpenseView()
+            }
+            .tabItem {
+                Image(systemName: "plus.circle.fill")
+                Text("Add")
+            }
+            .tag(2)
 
-            ReportsView()
-                .tabItem {
-                    Image(systemName: "chart.bar")
-                    Text("Reports")
-                }
-                .tag(3)
+            NavigationStack {
+                ReportsView()
+            }
+            .tabItem {
+                Image(systemName: "chart.bar")
+                Text("Reports")
+            }
+            .tag(3)
 
-            SettingsView()
-                .tabItem {
-                    Image(systemName: "gearshape.fill")
-                    Text("Settings")
-                }
-                .tag(4)
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem {
+                Image(systemName: "gearshape.fill")
+                Text("Settings")
+            }
+            .tag(4)
         }
-        .tint(.green)
+        .tint(accentColor)
     }
 }
-
 
 #Preview {
     ContentView()

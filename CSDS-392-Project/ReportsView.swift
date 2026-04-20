@@ -12,6 +12,11 @@ struct ReportsView: View {
     @Query(sort: \Expense.date, order: .reverse) private var expenses: [Expense]
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
+
     private var categoryTotals: [String: Double] {
         Dictionary(grouping: expenses, by: { $0.category })
             .mapValues { items in
@@ -41,76 +46,110 @@ struct ReportsView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 22) {
                 Text("Reports")
-                    .font(.system(size: 30, weight: .medium))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(secondaryAccent)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 10)
 
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Budget Breakdown")
                         .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(secondaryAccent)
 
                     if breakdownCategories.isEmpty {
                         Text("No categories set yet")
-                            .foregroundStyle(.white.opacity(0.9))
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(secondaryAccent.opacity(0.7))
                     } else {
-                        ForEach(breakdownCategories, id: \.name) { item in
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("\(item.name): \(item.spent, format: .currency(code: "USD"))/\(item.budget, format: .currency(code: "USD"))")
-                                    .font(.system(size: 18, weight: .medium))
-                                    .foregroundStyle(.white)
+                        VStack(spacing: 16) {
+                            ForEach(breakdownCategories, id: \.name) { item in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    HStack {
+                                        Text(item.name)
+                                            .font(.system(size: 18, weight: .semibold))
+                                            .foregroundStyle(secondaryAccent)
 
-                                ProgressView(value: progressValue(spent: item.spent, budget: item.budget))
-                                    .progressViewStyle(.linear)
-                                    .tint(.blue)
-                                    .frame(width: 300)
+                                        Spacer()
+
+                                        Text("\(item.spent, format: .currency(code: "USD")) / \(item.budget, format: .currency(code: "USD"))")
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(accentColor)
+                                    }
+
+                                    ProgressView(value: progressValue(spent: item.spent, budget: item.budget))
+                                        .progressViewStyle(.linear)
+                                        .tint(accentColor)
+                                        .scaleEffect(y: 1.6)
+                                }
+                                .padding(14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                        .fill(softBackground)
+                                )
                             }
                         }
                     }
                 }
+                .padding(18)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
 
-                HStack(alignment: .top, spacing: 40) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Monthly Report")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundStyle(.white)
+                VStack(alignment: .leading, spacing: 18) {
+                    Text("Monthly Report")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(secondaryAccent)
 
+                    HStack(alignment: .top, spacing: 24) {
                         CircleChartView(
                             values: chartValues,
                             lineWidth: 18
                         )
                         .frame(width: 160, height: 160)
-                    }
 
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Top Categories")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("Top Categories")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(secondaryAccent)
 
-                        if topCategories.isEmpty {
-                            Text("No expenses yet")
-                                .foregroundStyle(.white.opacity(0.9))
-                        } else {
-                            ForEach(topCategories.prefix(3), id: \.category) { item in
-                                Text("\(item.category): \(item.amount, format: .currency(code: "USD"))")
-                                    .font(.system(size: 18, weight: .medium))
-                                    .foregroundStyle(.white)
+                            if topCategories.isEmpty {
+                                Text("No expenses yet")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundStyle(secondaryAccent.opacity(0.7))
+                            } else {
+                                ForEach(topCategories.prefix(3), id: \.category) { item in
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(item.category)
+                                            .font(.system(size: 17, weight: .semibold))
+                                            .foregroundStyle(secondaryAccent)
+
+                                        Text(item.amount, format: .currency(code: "USD"))
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(accentColor)
+                                    }
+                                }
                             }
                         }
+
+                        Spacer()
                     }
                 }
+                .padding(18)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
 
                 Spacer(minLength: 100)
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 20)
             .padding(.top, 8)
+            .padding(.bottom, 24)
         }
         .background(
-            Color(red: 0.80, green: 0.68, blue: 0.40)
+            backgroundColor
                 .ignoresSafeArea()
         )
     }

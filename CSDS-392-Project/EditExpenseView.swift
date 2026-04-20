@@ -22,34 +22,44 @@ struct EditExpenseView: View {
 
     private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
 
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
     var body: some View {
         ZStack {
-            Color(red: 0.80, green: 0.68, blue: 0.40)
+            backgroundColor
                 .ignoresSafeArea()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 22) {
                     Text("Edit Expense")
-                        .font(.system(size: 28, weight: .medium))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 8)
 
-                    Group {
-                        Text("Title")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundStyle(.white)
+                    VStack(alignment: .leading, spacing: 18) {
+                        sectionLabel("Title")
 
-                        TextField("Expense name", text: $title)
-                            .padding()
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
+                        TextField(
+                            "",
+                            text: $title,
+                            prompt: Text("Expense name")
+                                .foregroundColor(secondaryAccent.opacity(0.5))
+                        )
+                        .foregroundStyle(secondaryAccent)
+                        .padding(.horizontal, 16)
+                        .frame(height: 52)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(fieldBorder, lineWidth: 1.5)
+                        }
 
-                    Group {
-                        Text("Category")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundStyle(.white)
+                        sectionLabel("Category")
 
                         Picker("Category", selection: $category) {
                             ForEach(categories, id: \.self) { item in
@@ -57,16 +67,18 @@ struct EditExpenseView: View {
                             }
                         }
                         .pickerStyle(.menu)
-                        .padding(.horizontal, 12)
-                        .frame(height: 44)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
+                        .tint(secondaryAccent)
+                        .padding(.horizontal, 14)
+                        .frame(height: 52)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(fieldBorder, lineWidth: 1.5)
+                        }
 
-                    Group {
-                        Text("Date")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundStyle(.white)
+                        sectionLabel("Date")
 
                         DatePicker(
                             "",
@@ -74,55 +86,82 @@ struct EditExpenseView: View {
                             displayedComponents: [.date, .hourAndMinute]
                         )
                         .labelsHidden()
-                        .tint(.blue)
-                    }
+                        .datePickerStyle(.compact)
+                        .tint(accentColor)
+                        .padding(.horizontal, 14)
+                        .frame(height: 52)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(fieldBorder, lineWidth: 1.5)
+                        }
 
-                    Group {
-                        Text("Amount")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundStyle(.white)
+                        sectionLabel("Amount")
 
-                        TextField("Value", text: $amount)
-                            .keyboardType(.decimalPad)
-                            .padding()
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
+                        TextField(
+                            "",
+                            text: $amount,
+                            prompt: Text("Value")
+                                .foregroundColor(secondaryAccent.opacity(0.5))
+                        )
+                        .keyboardType(.decimalPad)
+                        .foregroundStyle(secondaryAccent)
+                        .padding(.horizontal, 16)
+                        .frame(height: 52)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(fieldBorder, lineWidth: 1.5)
+                        }
 
-                    Group {
+                        sectionLabel("Notes")
+
                         TextEditor(text: $note)
+                            .scrollContentBackground(.hidden)
+                            .foregroundStyle(secondaryAccent)
                             .frame(height: 130)
-                            .padding(8)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .padding(12)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                             .overlay(alignment: .topLeading) {
                                 if note.isEmpty {
                                     Text("Notes (Optional)")
-                                        .foregroundStyle(.gray)
-                                        .padding(.top, 18)
-                                        .padding(.leading, 14)
+                                        .foregroundStyle(secondaryAccent.opacity(0.45))
+                                        .padding(.top, 22)
+                                        .padding(.leading, 18)
                                 }
                             }
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(fieldBorder, lineWidth: 1.5)
+                            }
                     }
+                    .padding(20)
+                    .background(Color.white.opacity(0.7))
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
 
                     Button {
                         saveChanges()
                     } label: {
-                        Text("Save")
+                        Text("Save Changes")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(.purple)
-                            .padding(.horizontal, 28)
-                            .padding(.vertical, 10)
-                            .background(.white.opacity(0.95))
-                            .clipShape(Capsule())
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(accentColor)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .shadow(color: accentColor.opacity(0.22), radius: 10, y: 6)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 18)
+                    .padding(.top, 4)
 
                     Spacer(minLength: 80)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 20)
                 .padding(.top, 12)
+                .padding(.bottom, 24)
             }
         }
         .navigationBarBackButtonHidden(false)
@@ -133,6 +172,13 @@ struct EditExpenseView: View {
             amount = String(format: "%.2f", expense.amount)
             note = expense.note
         }
+    }
+
+    @ViewBuilder
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(secondaryAccent)
     }
 
     private func saveChanges() {

@@ -16,6 +16,11 @@ struct ExpenseHistoryView: View {
 
     private let categories = ["All", "Food", "Rent", "Fun", "Transport", "Education"]
 
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
     private var filteredExpenses: [Expense] {
         expenses.filter { expense in
             let matchesSearch =
@@ -34,77 +39,101 @@ struct ExpenseHistoryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.80, green: 0.68, blue: 0.40)
+                backgroundColor
                     .ignoresSafeArea()
 
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 22) {
                         Text("Expense History")
-                            .font(.system(size: 28, weight: .medium))
-                            .foregroundStyle(.white)
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(secondaryAccent)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.top, 8)
 
-                        Text("Expenses")
-                            .font(.system(size: 22, weight: .semibold))
-                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Expenses")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(secondaryAccent)
 
-                        HStack(spacing: 12) {
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundStyle(.black.opacity(0.65))
+                            HStack(spacing: 12) {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundStyle(secondaryAccent.opacity(0.65))
 
-                                TextField("Search", text: $searchText)
-                                    .foregroundStyle(.black)
-
-                                Image(systemName: "mic.fill")
-                                    .foregroundStyle(.black.opacity(0.65))
-                            }
-                            .padding(.horizontal, 12)
-                            .frame(height: 40)
-                            .background(Color(red: 0.72, green: 0.60, blue: 0.32))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                            Menu {
-                                Picker("Filter", selection: $selectedCategory) {
-                                    ForEach(categories, id: \.self) { category in
-                                        Text(category).tag(category)
-                                    }
+                                    TextField(
+                                        "",
+                                        text: $searchText,
+                                        prompt: Text("Search").foregroundColor(secondaryAccent.opacity(0.5))
+                                    )
+                                    .foregroundStyle(secondaryAccent)
                                 }
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Text("Filter")
-                                        .foregroundStyle(.white)
-                                        .font(.system(size: 16, weight: .medium))
+                                .padding(.horizontal, 14)
+                                .frame(height: 48)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(fieldBorder, lineWidth: 1.5)
+                                }
 
-                                    Image(systemName: "line.3.horizontal.decrease")
-                                        .foregroundStyle(.white)
+                                Menu {
+                                    Picker("Filter", selection: $selectedCategory) {
+                                        ForEach(categories, id: \.self) { category in
+                                            Text(category).tag(category)
+                                        }
+                                    }
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Text(selectedCategory == "All" ? "Filter" : selectedCategory)
+                                            .font(.system(size: 15, weight: .semibold))
+
+                                        Image(systemName: "line.3.horizontal.decrease")
+                                            .font(.system(size: 14, weight: .medium))
+                                    }
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 14)
+                                    .frame(height: 48)
+                                    .background(accentColor)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .shadow(color: accentColor.opacity(0.2), radius: 8, y: 4)
+                                }
+                            }
+
+                            if filteredExpenses.isEmpty {
+                                VStack(spacing: 10) {
+                                    Image(systemName: "tray")
+                                        .font(.system(size: 28))
+                                        .foregroundStyle(accentColor.opacity(0.8))
+
+                                    Text("No expenses found")
+                                        .font(.system(size: 17, weight: .medium))
+                                        .foregroundStyle(secondaryAccent.opacity(0.7))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 28)
+                            } else {
+                                VStack(alignment: .leading, spacing: 14) {
+                                    ForEach(filteredExpenses) { expense in
+                                        NavigationLink {
+                                            EditExpenseView(expense: expense)
+                                        } label: {
+                                            ExpenseRowView(expense: expense)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
                                 }
                             }
                         }
-
-                        if filteredExpenses.isEmpty {
-                            Text("No expenses found")
-                                .foregroundStyle(.white.opacity(0.9))
-                                .padding(.top, 20)
-                        } else {
-                            VStack(alignment: .leading, spacing: 18) {
-                                ForEach(filteredExpenses) { expense in
-                                    NavigationLink {
-                                        EditExpenseView(expense: expense)
-                                    } label: {
-                                        ExpenseRowView(expense: expense)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                .onDelete(perform: deleteExpenses)
-                            }
-                        }
+                        .padding(18)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
 
                         Spacer(minLength: 100)
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                     .padding(.top, 12)
+                    .padding(.bottom, 24)
                 }
             }
             .navigationBarHidden(true)

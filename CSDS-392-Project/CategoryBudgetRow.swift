@@ -14,12 +14,16 @@ struct CategoryBudgetRow: View {
 
     @State private var amountText = ""
 
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(category.name)
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(secondaryAccent)
 
                 Spacer()
 
@@ -27,21 +31,32 @@ struct CategoryBudgetRow: View {
                     deleteCategory()
                 } label: {
                     Image(systemName: "trash")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(accentColor)
+                        .font(.system(size: 16, weight: .medium))
                 }
             }
 
             TextField("Value", text: $amountText)
                 .keyboardType(.decimalPad)
-                .padding(.horizontal, 12)
-                .frame(width: 240, height: 42)
-                .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .foregroundStyle(secondaryAccent)
+                .padding(.horizontal, 14)
+                .frame(height: 48)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(fieldBorder, lineWidth: 1.5)
+                }
                 .onChange(of: amountText) { _, newValue in
                     category.budgetAmount = Double(newValue) ?? 0
                     try? modelContext.save()
                 }
         }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color(red: 0.99, green: 0.98, blue: 0.97))
+        )
         .onAppear {
             amountText = category.budgetAmount == 0 ? "" : String(category.budgetAmount)
         }

@@ -17,185 +17,104 @@ struct BudgetEditorView: View {
     @State private var income = ""
     @State private var incomePeriod = "Monthly"
     @State private var newCategoryTitle = ""
-    @State private var showSavedMessage = false
 
     private let periods = ["Monthly", "Yearly", "Weekly", "Daily"]
 
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
     var body: some View {
         ZStack {
-            Color(red: 0.80, green: 0.68, blue: 0.40)
-                .ignoresSafeArea()
+            backgroundColor.ignoresSafeArea()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
 
-                    // Title
                     Text("Budget Editor")
-                        .font(.system(size: 32, weight: .medium))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 10)
 
-                    // Income Section
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Income")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundStyle(.white)
+                    VStack(spacing: 18) {
 
-                        HStack(spacing: 12) {
-                            TextField("Value", text: $income)
-                                .keyboardType(.decimalPad)
-                                .padding(.horizontal, 12)
-                                .frame(width: 150, height: 42)
-                                .background(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                            Picker("Period", selection: $incomePeriod) {
-                                ForEach(periods, id: \.self) { p in
-                                    Text(p).tag(p)
-                                }
+                        TextField("Income", text: $income)
+                            .keyboardType(.decimalPad)
+                            .padding()
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(fieldBorder, lineWidth: 1.5)
                             }
-                            .pickerStyle(.menu)
-                            .padding(.horizontal, 12)
-                            .frame(width: 120, height: 42)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                    }
 
-                    // Categories Section (Dynamic)
-                    VStack(alignment: .leading, spacing: 14) {
+                        Picker("Period", selection: $incomePeriod) {
+                            ForEach(periods, id: \.self) { Text($0) }
+                        }
+                        .pickerStyle(.menu)
+                        .padding()
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(fieldBorder, lineWidth: 1.5)
+                        }
+
                         ForEach(categories) { category in
                             CategoryBudgetRow(category: category)
                         }
 
-                        // Add new category
-                        HStack(spacing: 12) {
+                        HStack {
+                            TextField("New Category", text: $newCategoryTitle)
+                                .padding()
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+
                             Button {
                                 addCategory()
                             } label: {
-                                Image(systemName: "plus.circle")
-                                    .font(.system(size: 28))
-                                    .foregroundStyle(.white)
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundStyle(accentColor)
+                                    .font(.system(size: 26))
                             }
-
-                            TextField("Add Category Title", text: $newCategoryTitle)
-                                .padding(.horizontal, 12)
-                                .frame(height: 42)
-                                .background(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
-                    }
 
-                    // Save Button
-                    Button {
+                    }
+                    .padding(20)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
+
+                    Button("Save Changes") {
                         saveBudget()
-                    } label: {
-                        Text("Save")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundStyle(.purple)
-                            .padding(.horizontal, 34)
-                            .padding(.vertical, 10)
-                            .background(.white.opacity(0.95))
-                            .clipShape(Capsule())
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 14)
-
-                    if showSavedMessage {
-                        Text("Budget saved")
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(accentColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
 
                     Spacer(minLength: 100)
                 }
-                .padding(.horizontal, 30)
-                .padding(.top, 8)
+                .padding(.horizontal, 20)
             }
         }
-        .navigationBarBackButtonHidden(false)
-        .onAppear {
-            ensureBudgetExists()
-            seedCategoriesIfNeeded()
-            loadBudgetIntoFields()
-        }
     }
-
-    // MARK: - Setup
-
-    private func ensureBudgetExists() {
-        if budgets.isEmpty {
-            let newBudget = Budget()
-            modelContext.insert(newBudget)
-            try? modelContext.save()
-        }
-    }
-
-    private func seedCategoriesIfNeeded() {
-        if categories.isEmpty {
-            let defaults = [
-                "Food",
-                "Rent",
-                "Transportation",
-                "Fun",
-                "Education",
-                "Shopping",
-                "Health",
-                "Subscriptions"
-            ]
-
-            for name in defaults {
-                modelContext.insert(CategoryBudget(name: name))
-            }
-
-            try? modelContext.save()
-        }
-    }
-
-    private func loadBudgetIntoFields() {
-        guard let budget = budgets.first else { return }
-
-        income = budget.income == 0 ? "" : formatNumber(budget.income)
-        incomePeriod = budget.incomePeriod
-    }
-
-    // MARK: - Actions
 
     private func saveBudget() {
         guard let budget = budgets.first else { return }
-
         budget.income = Double(income) ?? 0
         budget.incomePeriod = incomePeriod
-
-        do {
-            try modelContext.save()
-            showSavedMessage = true
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                showSavedMessage = false
-            }
-        } catch {
-            print("Save failed: \(error)")
-        }
-    }
-
-    private func addCategory() {
-        let trimmed = newCategoryTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        let new = CategoryBudget(name: trimmed)
-        modelContext.insert(new)
-        newCategoryTitle = ""
-
         try? modelContext.save()
     }
 
-    private func formatNumber(_ value: Double) -> String {
-        if value == floor(value) {
-            return String(Int(value))
-        }
-        return String(value)
+    private func addCategory() {
+        guard !newCategoryTitle.isEmpty else { return }
+        modelContext.insert(CategoryBudget(name: newCategoryTitle))
+        newCategoryTitle = ""
+        try? modelContext.save()
     }
 }
 
