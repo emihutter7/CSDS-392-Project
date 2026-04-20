@@ -11,7 +11,6 @@ struct SummaryCard: View {
     let spent: Double
 
     private let backgroundColor = Color.white
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let softBackground = Color(red: 0.97, green: 0.95, blue: 0.94)
 
@@ -42,12 +41,10 @@ struct SummaryCard: View {
 
                     Text("\(Int(progress * 100))%")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(accentColor)
                 }
 
                 ProgressView(value: progress)
                     .progressViewStyle(.linear)
-                    .tint(accentColor)
                     .scaleEffect(y: 1.8)
             }
         }
@@ -70,7 +67,7 @@ struct SummaryCard: View {
 
             Text(value.formatted(.currency(code: "USD")))
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(accentColor)
+                .foregroundStyle(Color.accentColor)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)

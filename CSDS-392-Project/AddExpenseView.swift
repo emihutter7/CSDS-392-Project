@@ -20,7 +20,6 @@ struct AddExpenseView: View {
     private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
 
@@ -53,7 +52,6 @@ struct AddExpenseView: View {
                             displayedComponents: [.date, .hourAndMinute]
                         )
                         .datePickerStyle(.compact)
-                        .tint(accentColor)
 
                         inputField("Amount", text: $amount, keyboard: .decimalPad)
 
@@ -89,7 +87,6 @@ struct AddExpenseView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(accentColor)
                             .clipShape(RoundedRectangle(cornerRadius: 18))
                     }
 

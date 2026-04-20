@@ -17,7 +17,6 @@ struct ExpenseHistoryView: View {
     private let categories = ["All", "Food", "Rent", "Fun", "Transport", "Education"]
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
 
@@ -93,9 +92,7 @@ struct ExpenseHistoryView: View {
                                     .foregroundStyle(.white)
                                     .padding(.horizontal, 14)
                                     .frame(height: 48)
-                                    .background(accentColor)
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                    .shadow(color: accentColor.opacity(0.2), radius: 8, y: 4)
                                 }
                             }
 
@@ -103,7 +100,6 @@ struct ExpenseHistoryView: View {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
                                         .font(.system(size: 28))
-                                        .foregroundStyle(accentColor.opacity(0.8))
 
                                     Text("No expenses found")
                                         .font(.system(size: 17, weight: .medium))

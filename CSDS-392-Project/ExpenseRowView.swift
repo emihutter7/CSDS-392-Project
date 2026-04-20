@@ -11,19 +11,16 @@ struct ExpenseRowView: View {
     let expense: Expense
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let borderColor = Color(red: 0.88, green: 0.80, blue: 0.81)
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             Circle()
-                .fill(accentColor.opacity(0.14))
                 .frame(width: 42, height: 42)
                 .overlay {
                     Image(systemName: "creditcard.fill")
                         .font(.system(size: 16))
-                        .foregroundStyle(accentColor)
                 }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -36,16 +33,13 @@ struct ExpenseRowView: View {
 
                     Text(expense.amount, format: .currency(code: "USD"))
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(accentColor)
                 }
 
                 HStack(spacing: 8) {
                     Text(expense.category)
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(accentColor)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
-                        .background(accentColor.opacity(0.12))
                         .clipShape(Capsule())
 
                     Spacer()

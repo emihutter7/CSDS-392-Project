@@ -11,8 +11,6 @@ struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
     @State private var selectedTab = 0
 
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
-
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
@@ -60,7 +58,6 @@ struct ContentView: View {
             }
             .tag(4)
         }
-        .tint(accentColor)
     }
 }
 

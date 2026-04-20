@@ -15,7 +15,6 @@ struct LoginView: View {
     @State private var showPassword: Bool = false
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let softFieldBackground = Color.white
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
@@ -72,7 +71,6 @@ struct LoginView: View {
                                 showPassword.toggle()
                             } label: {
                                 Image(systemName: showPassword ? "eye.slash" : "eye")
-                                    .foregroundStyle(accentColor)
                                     .font(.system(size: 18, weight: .medium))
                             }
                         }
@@ -114,10 +112,9 @@ struct LoginView: View {
                         .background(
                             isSignInButtonDisabled
                             ? Color.gray.opacity(0.45)
-                            : accentColor
+                            : Color.accentColor
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                        .shadow(color: isSignInButtonDisabled ? .clear : accentColor.opacity(0.22), radius: 10, y: 6)
                         .disabled(isSignInButtonDisabled || authModel.isLoading)
 
                         Button {
@@ -127,7 +124,6 @@ struct LoginView: View {
                         } label: {
                             Text("Create Account")
                                 .font(.system(size: 17, weight: .semibold))
-                                .foregroundStyle(accentColor)
                                 .frame(maxWidth: .infinity, minHeight: 56)
                                 .background(Color.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

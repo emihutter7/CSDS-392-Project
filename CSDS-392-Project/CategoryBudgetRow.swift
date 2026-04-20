@@ -14,7 +14,6 @@ struct CategoryBudgetRow: View {
 
     @State private var amountText = ""
 
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
 
@@ -31,7 +30,6 @@ struct CategoryBudgetRow: View {
                     deleteCategory()
                 } label: {
                     Image(systemName: "trash")
-                        .foregroundStyle(accentColor)
                         .font(.system(size: 16, weight: .medium))
                 }
             }

@@ -14,7 +14,6 @@ struct HomeView: View {
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let cardColor = Color.white
 
@@ -62,9 +61,7 @@ struct HomeView: View {
                             Spacer()
                         }
                         .frame(height: 58)
-                        .background(accentColor)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                        .shadow(color: accentColor.opacity(0.22), radius: 10, y: 6)
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 2)
@@ -84,12 +81,10 @@ struct HomeView: View {
                                 ForEach(recentExpenses) { expense in
                                     HStack(alignment: .top, spacing: 12) {
                                         Circle()
-                                            .fill(accentColor.opacity(0.14))
                                             .frame(width: 42, height: 42)
                                             .overlay {
                                                 Image(systemName: "creditcard.fill")
                                                     .font(.system(size: 16))
-                                                    .foregroundStyle(accentColor)
                                             }
 
                                         VStack(alignment: .leading, spacing: 4) {

@@ -13,7 +13,6 @@ struct ReportsView: View {
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
 
@@ -76,12 +75,10 @@ struct ReportsView: View {
 
                                         Text("\(item.spent, format: .currency(code: "USD")) / \(item.budget, format: .currency(code: "USD"))")
                                             .font(.system(size: 15, weight: .medium))
-                                            .foregroundStyle(accentColor)
                                     }
 
                                     ProgressView(value: progressValue(spent: item.spent, budget: item.budget))
                                         .progressViewStyle(.linear)
-                                        .tint(accentColor)
                                         .scaleEffect(y: 1.6)
                                 }
                                 .padding(14)
@@ -128,7 +125,6 @@ struct ReportsView: View {
 
                                         Text(item.amount, format: .currency(code: "USD"))
                                             .font(.system(size: 15, weight: .medium))
-                                            .foregroundStyle(accentColor)
                                     }
                                 }
                             }

@@ -23,7 +23,6 @@ struct EditExpenseView: View {
     private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
 
@@ -87,7 +86,6 @@ struct EditExpenseView: View {
                         )
                         .labelsHidden()
                         .datePickerStyle(.compact)
-                        .tint(accentColor)
                         .padding(.horizontal, 14)
                         .frame(height: 52)
                         .background(Color.white)
@@ -151,9 +149,7 @@ struct EditExpenseView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(accentColor)
                             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            .shadow(color: accentColor.opacity(0.22), radius: 10, y: 6)
                     }
                     .padding(.top, 4)
 

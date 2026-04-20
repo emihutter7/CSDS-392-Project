@@ -13,7 +13,6 @@ struct SettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
     private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
@@ -50,7 +49,6 @@ struct SettingsView: View {
 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(accentColor)
                             }
                             .padding(16)
                             .background(
@@ -92,16 +90,15 @@ struct SettingsView: View {
                     .frame(height: 54)
                     .background(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(accentColor)
+                            .fill(Color.accentColor)
                     )
-                    .shadow(color: accentColor.opacity(0.22), radius: 10, y: 6)
                     .padding(.bottom, 40)
                 }
                 .padding(.horizontal, 20)
             }
             .navigationBarHidden(true)
             .preferredColorScheme(darkModeEnabled ? .dark : .light)
-            .tint(accentColor)
+            .tint(Color.accentColor)
         }
     }
 
@@ -122,7 +119,6 @@ struct SettingsView: View {
 
             Toggle("", isOn: isOn)
                 .labelsHidden()
-                .tint(accentColor)
         }
         .padding(16)
         .background(
