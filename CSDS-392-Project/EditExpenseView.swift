@@ -197,3 +197,7 @@ struct EditExpenseView: View {
         }
     }
 }
+
+#Preview {
+    EditExpenseView()
+}

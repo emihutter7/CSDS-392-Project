@@ -58,11 +58,12 @@ struct HomeView: View {
                             
                             Text("Add Expense")
                                 .font(.system(size: 19, weight: .semibold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(secondaryAccent)
                             
                             Spacer()
                         }
                         .frame(height: 58)
+                        .background(cardColor) // change color later if you want
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .buttonStyle(.plain)
@@ -78,12 +79,12 @@ struct HomeView: View {
                             
                             Text("Import Bank Transactions")
                                 .font(.system(size: 19, weight: .semibold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(secondaryAccent)
                             
                             Spacer()
                         }
                         .frame(height: 58)
-                        .background(Color.blue) // change color later if you want
+                        .background(cardColor) // change color later if you want
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .padding(.top, 2)
@@ -97,6 +98,7 @@ struct HomeView: View {
                         Text("Recent Expenses")
                             .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(secondaryAccent)
+                            .frame(maxWidth: .infinity)
                         
                         if recentExpenses.isEmpty {
                             Text("No expenses yet")
@@ -107,24 +109,11 @@ struct HomeView: View {
                             VStack(spacing: 12) {
                                 ForEach(recentExpenses) { expense in
                                     HStack(alignment: .top, spacing: 12) {
-                                        Circle()
-                                            .frame(width: 42, height: 42)
-                                            .overlay {
-                                                Image(systemName: "creditcard.fill")
-                                                    .font(.system(size: 16))
-                                            }
-                                        
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(expense.title)
                                                 .font(.system(size: 18, weight: .semibold))
                                                 .foregroundStyle(secondaryAccent)
                                             
-                                            if !expense.note.isEmpty {
-                                                Text(expense.note)
-                                                    .font(.system(size: 14))
-                                                    .foregroundStyle(secondaryAccent.opacity(0.7))
-                                                    .lineLimit(1)
-                                            }
                                         }
                                         
                                         Spacer()
