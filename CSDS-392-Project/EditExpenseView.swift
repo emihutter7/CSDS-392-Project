@@ -11,21 +11,36 @@ import SwiftData
 struct EditExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
     let expense: Expense
 
     @State private var title: String = ""
-    @State private var category: String = "Food"
+    @State private var category: String = ""
     @State private var date: Date = Date()
     @State private var amount: String = ""
     @State private var note: String = ""
     @State private var transactionType: TransactionType = .expense
-
-    private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
+    @State private var newCategoryTitle = ""
+    @State private var showAddCategoryField = false
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
+    private var categories: [String] {
+        let saved = categoryBudgets.map(\.name)
+
+        if saved.isEmpty {
+            return ["Food", "Bills", "Shopping", "Transportation", "Entertainment", "Salary", "Other"]
+        }
+
+        return saved
+    }
+
+    private var amountColor: Color {
+        transactionType == .income ? .green : Color.accentColor
+    }
 
     var body: some View {
         ZStack {
@@ -34,19 +49,29 @@ struct EditExpenseView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
-                    Text("Edit Expense")
+                    Text("Edit Transaction")
                         .font(.system(size: 30, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 8)
 
                     VStack(alignment: .leading, spacing: 18) {
+                        sectionLabel("Transaction Type")
+
+                        Picker("Transaction Type", selection: $transactionType) {
+                            ForEach(TransactionType.allCases, id: \.self) { type in
+                                Text(type.rawValue).tag(type)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .tint(amountColor)
+
                         sectionLabel("Title")
 
                         TextField(
                             "",
                             text: $title,
-                            prompt: Text("Expense name")
+                            prompt: Text("Transaction name")
                                 .foregroundColor(secondaryAccent.opacity(0.5))
                         )
                         .foregroundStyle(secondaryAccent)
@@ -59,23 +84,64 @@ struct EditExpenseView: View {
                                 .stroke(fieldBorder, lineWidth: 1.5)
                         }
 
-                        sectionLabel("Category")
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                sectionLabel("Category")
 
-                        Picker("Category", selection: $category) {
-                            ForEach(categories, id: \.self) { item in
-                                Text(item).tag(item)
+                                Spacer()
+
+                                Button {
+                                    showAddCategoryField.toggle()
+                                } label: {
+                                    Image(systemName: showAddCategoryField ? "minus.circle.fill" : "plus.circle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(amountColor)
+                                }
                             }
-                        }
-                        .pickerStyle(.menu)
-                        .tint(secondaryAccent)
-                        .padding(.horizontal, 14)
-                        .frame(height: 52)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(fieldBorder, lineWidth: 1.5)
+
+                            Picker("Category", selection: $category) {
+                                if categories.isEmpty {
+                                    Text("No categories").tag("")
+                                } else {
+                                    ForEach(categories, id: \.self) { item in
+                                        Text(item).tag(item)
+                                    }
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(secondaryAccent)
+                            .padding(.horizontal, 14)
+                            .frame(height: 52)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(fieldBorder, lineWidth: 1.5)
+                            }
+
+                            if showAddCategoryField {
+                                HStack(spacing: 10) {
+                                    TextField("New category", text: $newCategoryTitle)
+                                        .foregroundStyle(secondaryAccent)
+                                        .padding(.horizontal, 14)
+                                        .frame(height: 52)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .overlay {
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .stroke(fieldBorder, lineWidth: 1.5)
+                                        }
+
+                                    Button {
+                                        addCategory()
+                                    } label: {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundStyle(amountColor)
+                                    }
+                                }
+                            }
                         }
 
                         sectionLabel("Date")
@@ -150,6 +216,10 @@ struct EditExpenseView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
+                            .background(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .fill(amountColor)
+                            )
                             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .padding(.top, 4)
@@ -169,6 +239,10 @@ struct EditExpenseView: View {
             amount = String(format: "%.2f", expense.amount)
             note = expense.note
             transactionType = expense.type
+
+            if category.isEmpty, let firstCategory = categories.first {
+                category = firstCategory
+            }
         }
     }
 
@@ -179,17 +253,46 @@ struct EditExpenseView: View {
             .foregroundStyle(secondaryAccent)
     }
 
-    private func saveChanges() {
-        guard let amountValue = Double(amount),
-              !title.trimmingCharacters(in: .whitespaces).isEmpty else {
+    private func addCategory() {
+        let trimmed = newCategoryTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let alreadyExists = categoryBudgets.contains {
+            $0.name.localizedCaseInsensitiveCompare(trimmed) == .orderedSame
+        }
+
+        if alreadyExists {
+            category = trimmed
+            newCategoryTitle = ""
+            showAddCategoryField = false
             return
         }
 
-        expense.title = title
-        expense.category = category
+        let newCategory = CategoryBudget(name: trimmed)
+        modelContext.insert(newCategory)
+
+        do {
+            try modelContext.save()
+            category = trimmed
+            newCategoryTitle = ""
+            showAddCategoryField = false
+        } catch {
+            print("Failed to save category: \(error)")
+        }
+    }
+
+    private func saveChanges() {
+        guard let amountValue = Double(amount),
+              amountValue > 0,
+              !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+
+        expense.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        expense.category = category.isEmpty ? "Other" : category
         expense.date = date
         expense.amount = amountValue
-        expense.note = note
+        expense.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
         expense.type = transactionType
 
         do {
@@ -213,6 +316,5 @@ struct EditExpenseView: View {
     return NavigationStack {
         EditExpenseView(expense: sampleExpense)
     }
-    .modelContainer(for: Expense.self, inMemory: true)
+    .modelContainer(for: [Expense.self, CategoryBudget.self], inMemory: true)
 }
-

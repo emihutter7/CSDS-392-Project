@@ -39,16 +39,6 @@ struct BudgetEditorView: View {
 
                     VStack(spacing: 18) {
 
-                        TextField("Income", text: $income)
-                            .keyboardType(.decimalPad)
-                            .padding()
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(fieldBorder, lineWidth: 1.5)
-                            }
-
                         Picker("Period", selection: $incomePeriod) {
                             ForEach(periods, id: \.self) { Text($0) }
                         }

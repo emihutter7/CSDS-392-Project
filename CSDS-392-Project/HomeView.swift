@@ -24,9 +24,16 @@ struct HomeView: View {
     }
 
     private var totalSpent: Double {
-        expenses.reduce(0) { $0 + $1.amount }
+        expenses
+            .filter { $0.type == .expense }
+            .reduce(0) { $0 + $1.amount }
     }
 
+    private var totalIncome: Double {
+        expenses
+            .filter { $0.type == .income }
+            .reduce(0) { $0 + $1.amount }
+    }
     private var recentExpenses: [Expense] {
         Array(expenses.prefix(5))
     }
@@ -56,7 +63,7 @@ struct HomeView: View {
                         HStack {
                             Spacer()
                             
-                            Text("Add Expense")
+                            Text("Add Transaction")
                                 .font(.system(size: 19, weight: .semibold))
                                 .foregroundStyle(secondaryAccent)
                             
@@ -95,7 +102,7 @@ struct HomeView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Recent Expenses")
+                        Text("Recent Transactions")
                             .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(secondaryAccent)
                             .frame(maxWidth: .infinity)
@@ -113,7 +120,7 @@ struct HomeView: View {
                                             .frame(width: 42, height: 42)
                                             .foregroundStyle(Color.accentColor)
                                             .overlay {
-                                                Image(systemName: "creditcard.fill")
+                                                Image(systemName: expense.type == .income ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
                                                     .font(.system(size: 16))
                                             }
 
@@ -126,7 +133,11 @@ struct HomeView: View {
                                         
                                         Spacer()
                                         
-                                        Text(expense.amount.formatted(.currency(code: "USD")))
+                                        Text(
+                                            "\(expense.type == .income ? "+" : "-")" +
+                                            String(format: "$%.2f", expense.amount)
+                                        )
+                                        .foregroundStyle(expense.type == .income ? Color.green : secondaryAccent)
                                             .font(.system(size: 17, weight: .semibold))
                                             .foregroundStyle(secondaryAccent)
                                     }
@@ -158,12 +169,15 @@ struct HomeView: View {
         let transactions = await MockTellerService.shared.fetchTransactions()
 
         for transaction in transactions {
+            let type: TransactionType = transaction.amount > 0 ? .income : .expense
+
             let expense = Expense(
                 title: transaction.description,
-                amount: transaction.amount,
+                amount: abs(transaction.amount),
                 category: transaction.mappedCategory(),
                 date: transaction.date,
-                note: transaction.description
+                note: transaction.description,
+                type: type
             )
             modelContext.insert(expense)
         }
