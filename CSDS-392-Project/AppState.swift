@@ -7,12 +7,9 @@
 
 import SwiftUI
 
-struct AppState: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
-
-#Preview {
-    AppState()
+@Observable
+@MainActor
+final class AppState {
+    var selectedTab: Int = 0 //number for 0 to 4, determines which tab is active (home, expenses, add, reports, settings)
+    var currentUserEmail: String? // know the email of the person logged in without accessin authmodel in each screen
 }
