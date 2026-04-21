@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -18,11 +19,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct CSDS_392_ProjectApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var authModel = AuthModel()
-    
-    init() {
-        FirebaseApp.configure()
-    }
     
     var body: some Scene {
         WindowGroup {
@@ -35,5 +33,6 @@ struct CSDS_392_ProjectApp: App {
             }
             .environment(authModel)
         }
+        .modelContainer(for: [Expense.self, Budget.self, CategoryBudget.self])
     }
 }

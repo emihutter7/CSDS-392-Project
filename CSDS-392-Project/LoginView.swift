@@ -9,95 +9,135 @@ import SwiftUI
 
 struct LoginView: View {
     @Environment(AuthModel.self) private var authModel
-    
-    @State var email: String = ""
-    @State var password: String = ""
-    @State var showPassword: Bool = false
-    var isSignInButtonDisabled: Bool {
+
+    @State private var email: String = ""
+    @State private var password: String = ""
+    @State private var showPassword: Bool = false
+
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let softFieldBackground = Color.white
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
+    private var isSignInButtonDisabled: Bool {
         [email, password].contains(where: \.isEmpty)
     }
-    
+
     var body: some View {
         NavigationStack {
-            VStack {
-                Spacer()
-                
-                TextField("Email", text: $email, prompt: Text("Email").foregroundColor(.blue))
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .padding(10)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(.blue, lineWidth: 2)
+            ZStack {
+                backgroundColor
+                    .ignoresSafeArea()
+
+                VStack(spacing: 24) {
+                    Spacer()
+
+                    VStack(spacing: 12) {
+                        Text("Welcome Back")
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(secondaryAccent)
+
+                        Text("Sign in to manage your budget")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(secondaryAccent.opacity(0.7))
                     }
-                    .padding(.horizontal)
-                
-                HStack {
-                    Group {
-                        if showPassword {
-                            TextField("Password", text: $password, prompt: Text("Password").foregroundColor(.blue))
+
+                    VStack(spacing: 16) {
+                        TextField("", text: $email, prompt: Text("Email").foregroundColor(secondaryAccent.opacity(0.55)))
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .foregroundStyle(secondaryAccent)
+                            .padding(.horizontal, 16)
+                            .frame(height: 56)
+                            .background(softFieldBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(fieldBorder, lineWidth: 1.5)
+                            }
+
+                        HStack(spacing: 10) {
+                            Group {
+                                if showPassword {
+                                    TextField("", text: $password, prompt: Text("Password").foregroundColor(secondaryAccent.opacity(0.55)))
+                                } else {
+                                    SecureField("", text: $password, prompt: Text("Password").foregroundColor(secondaryAccent.opacity(0.55)))
+                                }
+                            }
+                            .foregroundStyle(secondaryAccent)
+
+                            Button {
+                                showPassword.toggle()
+                            } label: {
+                                Image(systemName: showPassword ? "eye.slash" : "eye")
+                                    .font(.system(size: 18, weight: .medium))
+                            }
                         }
-                        else {
-                            SecureField("Password", text: $password, prompt: Text("Password").foregroundColor(.blue))
+                        .padding(.horizontal, 16)
+                        .frame(height: 56)
+                        .background(softFieldBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(fieldBorder, lineWidth: 1.5)
+                        }
+
+                        if !authModel.errorMessage.isEmpty {
+                            Text(authModel.errorMessage)
+                                .foregroundStyle(.red.opacity(0.85))
+                                .font(.footnote)
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 4)
                         }
                     }
-                    .padding(10)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(.blue, lineWidth:2)
+
+                    VStack(spacing: 14) {
+                        Button {
+                            Task {
+                                await authModel.signIn(email: email, password: password)
+                            }
+                        } label: {
+                            if authModel.isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                                    .frame(maxWidth: .infinity, minHeight: 56)
+                            } else {
+                                Text("Sign In")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .frame(maxWidth: .infinity, minHeight: 56)
+                            }
+                        }
+                        .background(
+                            isSignInButtonDisabled
+                            ? Color.gray.opacity(0.45)
+                            : Color.accentColor
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .disabled(isSignInButtonDisabled || authModel.isLoading)
+
+                        Button {
+                            Task {
+                                await authModel.createAccount(email: email, password: password)
+                            }
+                        } label: {
+                            Text("Create Account")
+                                .font(.system(size: 17, weight: .semibold))
+                                .frame(maxWidth: .infinity, minHeight: 56)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                        .stroke(fieldBorder, lineWidth: 1.5)
+                                }
+                        }
+                        .disabled(isSignInButtonDisabled || authModel.isLoading)
                     }
-                    
-                    Button {
-                        showPassword.toggle()
-                    } label: {
-                        Image(systemName: showPassword ? "eye.slash" : "eye").foregroundColor(.accentColor)
-                    }
+
+                    Spacer()
                 }
-                .padding(.horizontal)
-                .padding(.vertical)
-                
-                if !authModel.errorMessage.isEmpty {
-                    Text(authModel.errorMessage)
-                        .foregroundStyle(Color.red)
-                        .font(.footnote)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-                Button {
-                    Task {
-                        await authModel.signIn(email: email, password: password)
-                    }
-                } label: {
-                    if authModel.isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, minHeight: 50)
-                    } else {
-                        Text("Sign In").font(.title2).bold().foregroundColor(.white)
-                            .frame(height: 50)
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                .background (
-                    isSignInButtonDisabled ? LinearGradient(colors: [.gray, .red], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
-                .cornerRadius(20)
-                .disabled(isSignInButtonDisabled || authModel.isLoading)
-                .padding(.horizontal)
-                
-                Button {
-                    Task {
-                        await authModel.createAccount(email: email, password: password)
-                    }
-                } label: {
-                    Text("Create Account")
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                }
-                .buttonStyle(.bordered)
-                .disabled(isSignInButtonDisabled || authModel.isLoading)
-                .padding()
-                
-                Spacer()
+                .padding(.horizontal, 24)
             }
         }
     }

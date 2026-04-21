@@ -10,13 +10,11 @@ import SwiftData
 
 @Model
 final class Budget {
-    var total: Double
-    var categoryBudgets: [String: Double]
-    var remainingBalance: Double //may or may not need
+    var income: Double
+    var incomePeriod: String
 
-    init(total: Double, categoryBudgets: [String: Double], remainingBalance: Double) {
-        self.total = total
-        self.categoryBudgets = categoryBudgets
-        self.remainingBalance = remainingBalance
+    init(income: Double = 0, incomePeriod: String = "Monthly") {
+        self.income = income
+        self.incomePeriod = incomePeriod
     }
 }

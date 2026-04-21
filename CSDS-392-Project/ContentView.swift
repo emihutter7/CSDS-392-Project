@@ -9,58 +9,55 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
-    @State private var showSignOut = false
-    
+    @State private var selectedTab = 0
+
     var body: some View {
-        NavigationStack {
-            Text("Welcome!")
-            Spacer()
-            
-            
+        TabView(selection: $selectedTab) {
+            NavigationStack {
+                HomeView()
             }
-        .navigationDestination(isPresented: $showSignOut) {
-                        SignOutView()
-                    }
-        .toolbar {
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
-                    Image(systemName: "house.fill")
-                        .resizable()
-                        .scaledToFit()
-                }
+            .tabItem {
+                Image(systemName: "house.fill")
+                Text("Home")
             }
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
-                    Image("ExpensesIcon")
-                        .resizable()
-                        .scaledToFit()
-                }
+            .tag(0)
+
+            NavigationStack {
+                ExpenseHistoryView()
             }
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
-                    Image(systemName: "square.and.pencil")
-                        .resizable()
-                        .scaledToFit()
-                }
+            .tabItem {
+                Image(systemName: "dollarsign.circle")
+                Text("Expenses")
             }
-            ToolbarItem(placement: .bottomBar) {
-                Button (action: {}){
-                    Image("ReportsIcon")
-                        .resizable()
-                        .scaledToFit()
-                }
+            .tag(1)
+
+            NavigationStack {
+                AddExpenseView()
             }
-            ToolbarItem(placement: .bottomBar) {
-                Button(action: {
-                    showSignOut = true
-                }) {
-                    Image(systemName: "gearshape.fill")
-                        .resizable()
-                        .scaledToFit()
-                }
+            .tabItem {
+                Image(systemName: "plus.circle.fill")
+                Text("Add")
             }
+            .tag(2)
+
+            NavigationStack {
+                ReportsView()
+            }
+            .tabItem {
+                Image(systemName: "chart.bar")
+                Text("Reports")
+            }
+            .tag(3)
+
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem {
+                Image(systemName: "gearshape.fill")
+                Text("Settings")
+            }
+            .tag(4)
         }
-        .padding()
     }
 }
 
