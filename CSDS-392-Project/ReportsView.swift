@@ -57,11 +57,13 @@ struct ReportsView: View {
                     Text("Budget Breakdown")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
+                        .frame(maxWidth: .infinity)
 
                     if breakdownCategories.isEmpty {
                         Text("No categories set yet")
                             .font(.system(size: 17, weight: .medium))
                             .foregroundStyle(secondaryAccent.opacity(0.7))
+                            .frame(maxWidth: .infinity)
                     } else {
                         VStack(spacing: 16) {
                             ForEach(breakdownCategories, id: \.name) { item in
