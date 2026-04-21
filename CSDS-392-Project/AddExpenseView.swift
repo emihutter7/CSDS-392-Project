@@ -9,19 +9,25 @@ import SwiftData
 
 struct AddExpenseView: View {
     @Environment(\.modelContext) private var modelContext
+    @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
     @State private var title = ""
-    @State private var category = "Food"
+    @State private var category = ""
     @State private var date = Date()
     @State private var amount = ""
     @State private var note = ""
     @State private var showSavedMessage = false
 
-    private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
+    @State private var newCategoryTitle = ""
+    @State private var showAddCategoryField = false
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+
+    private var categories: [String] {
+        categoryBudgets.map(\.name)
+    }
 
     var body: some View {
         ZStack {
@@ -29,29 +35,99 @@ struct AddExpenseView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
-
                     Text("Add Expense")
                         .font(.system(size: 30, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 10)
 
-                    VStack(spacing: 18) {
-
+                    VStack(alignment: .leading, spacing: 18) {
                         inputField("Title", text: $title)
 
-                        PickerField(
-                            label: "Category",
-                            selection: $category,
-                            options: categories
-                        )
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Text("Category")
+                                    .font(.system(size: 17, weight: .semibold))
+                                    .foregroundStyle(secondaryAccent)
 
-                        DatePicker(
-                            "Date",
-                            selection: $date,
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
-                        .datePickerStyle(.compact)
+                                Spacer()
+
+                                Button {
+                                    showAddCategoryField.toggle()
+                                } label: {
+                                    Image(systemName: showAddCategoryField ? "minus.circle.fill" : "plus.circle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(Color.accentColor)
+                                }
+                            }
+
+                            Picker("Category", selection: $category) {
+                                if categories.isEmpty {
+                                    Text("No categories").tag("")
+                                } else {
+                                    ForEach(categories, id: \.self) { item in
+                                        Text(item).tag(item)
+                                    }
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .padding(.horizontal, 14)
+                            .frame(height: 52)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(fieldBorder, lineWidth: 1.5)
+                            }
+
+                            if showAddCategoryField {
+                                HStack(spacing: 10) {
+                                    TextField("New category", text: $newCategoryTitle)
+                                        .foregroundStyle(secondaryAccent)
+                                        .padding(.horizontal, 14)
+                                        .frame(height: 52)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .overlay {
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .stroke(fieldBorder, lineWidth: 1.5)
+                                        }
+
+                                    Button {
+                                        addCategory()
+                                    } label: {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundStyle(Color.accentColor)
+                                    }
+                                }
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Date")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(Color.accentColor)
+
+                            DatePicker(
+                                "",
+                                selection: $date,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                            .labelsHidden()
+                            .datePickerStyle(.compact)
+                            .tint(.accentColor)
+                            .padding(.horizontal, 14)
+                            .frame(height: 52)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.accentColor.opacity(0.25), lineWidth: 1.5)
+                            }
+                        }
 
                         inputField("Amount", text: $amount, keyboard: .decimalPad)
 
@@ -72,7 +148,6 @@ struct AddExpenseView: View {
                                         .padding(.leading, 16)
                                 }
                             }
-
                     }
                     .padding(20)
                     .background(Color.white)
@@ -87,7 +162,10 @@ struct AddExpenseView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .background(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .fill(Color.accentColor)
+                            )
                     }
 
                     if showSavedMessage {
@@ -100,6 +178,11 @@ struct AddExpenseView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
+            }
+        }
+        .onAppear {
+            if category.isEmpty, let firstCategory = categories.first {
+                category = firstCategory
             }
         }
     }
@@ -118,39 +201,63 @@ struct AddExpenseView: View {
             }
     }
 
-    private func PickerField(label: String, selection: Binding<String>, options: [String]) -> some View {
-        Picker(label, selection: selection) {
-            ForEach(options, id: \.self) { item in
-                Text(item).tag(item)
-            }
+    private func addCategory() {
+        let trimmed = newCategoryTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let alreadyExists = categoryBudgets.contains {
+            $0.name.localizedCaseInsensitiveCompare(trimmed) == .orderedSame
         }
-        .pickerStyle(.menu)
-        .padding(.horizontal, 14)
-        .frame(height: 52)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(fieldBorder, lineWidth: 1.5)
+
+        if alreadyExists {
+            category = trimmed
+            newCategoryTitle = ""
+            showAddCategoryField = false
+            return
+        }
+
+        let newCategory = CategoryBudget(name: trimmed)
+        modelContext.insert(newCategory)
+
+        do {
+            try modelContext.save()
+            category = trimmed
+            newCategoryTitle = ""
+            showAddCategoryField = false
+        } catch {
+            print("Failed to save category: \(error)")
         }
     }
 
     private func saveExpense() {
-        guard let amountValue = Double(amount),
-              !title.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        modelContext.insert(Expense(
-            title: title,
+        guard !trimmedTitle.isEmpty,
+              let amountValue = Double(amount),
+              !category.isEmpty else {
+            return
+        }
+
+        let newExpense = Expense(
+            title: trimmedTitle,
             amount: amountValue,
             category: category,
             date: date,
-            note: note
-        ))
+            note: trimmedNote
+        )
+
+        modelContext.insert(newExpense)
 
         title = ""
         amount = ""
         note = ""
+        date = Date()
         showSavedMessage = true
+
+        if let firstCategory = categories.first {
+            category = firstCategory
+        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             showSavedMessage = false

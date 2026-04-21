@@ -82,6 +82,7 @@ struct HomeView: View {
                                     HStack(alignment: .top, spacing: 12) {
                                         Circle()
                                             .frame(width: 42, height: 42)
+                                            .foregroundStyle(Color.accentColor)
                                             .overlay {
                                                 Image(systemName: "creditcard.fill")
                                                     .font(.system(size: 16))

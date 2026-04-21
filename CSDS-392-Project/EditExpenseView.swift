@@ -19,6 +19,7 @@ struct EditExpenseView: View {
     @State private var date: Date = Date()
     @State private var amount: String = ""
     @State private var note: String = ""
+    @State private var transactionType: TransactionType = .expense
 
     private let categories = ["Food", "Rent", "Fun", "Transport", "Education"]
 
@@ -167,6 +168,7 @@ struct EditExpenseView: View {
             date = expense.date
             amount = String(format: "%.2f", expense.amount)
             note = expense.note
+            transactionType = expense.type
         }
     }
 
@@ -188,6 +190,7 @@ struct EditExpenseView: View {
         expense.date = date
         expense.amount = amountValue
         expense.note = note
+        expense.type = transactionType
 
         do {
             try modelContext.save()

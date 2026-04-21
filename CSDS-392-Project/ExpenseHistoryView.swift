@@ -100,6 +100,7 @@ struct ExpenseHistoryView: View {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
                                         .font(.system(size: 28))
+                                        .foregroundStyle(Color.accentColor)
 
                                     Text("No expenses found")
                                         .font(.system(size: 17, weight: .medium))

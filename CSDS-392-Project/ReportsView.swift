@@ -75,6 +75,7 @@ struct ReportsView: View {
 
                                         Text("\(item.spent, format: .currency(code: "USD")) / \(item.budget, format: .currency(code: "USD"))")
                                             .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(Color.accentColor)
                                     }
 
                                     ProgressView(value: progressValue(spent: item.spent, budget: item.budget))
