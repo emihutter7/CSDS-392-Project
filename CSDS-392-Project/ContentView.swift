@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
     @State private var selectedTab = 0
+
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -21,7 +23,7 @@ struct ContentView: View {
                 Text("Home")
             }
             .tag(0)
-
+            
             NavigationStack {
                 ExpenseHistoryView()
             }
@@ -60,6 +62,8 @@ struct ContentView: View {
         }
     }
 }
+
+
 
 #Preview {
     ContentView()

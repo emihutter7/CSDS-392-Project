@@ -159,7 +159,7 @@ struct AddExpenseView: View {
                     } label: {
                         Text("Add Expense")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(secondaryAccent)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(
