@@ -1,3 +1,7 @@
 
-
+# Firebase files
 GoogleService-Info.plist
+
+# Xcode user files
+xcuserdata/
+*.xcuserstate
