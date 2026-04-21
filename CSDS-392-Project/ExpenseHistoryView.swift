@@ -58,6 +58,7 @@ struct ExpenseHistoryView: View {
                                 HStack(spacing: 10) {
                                     Image(systemName: "magnifyingglass")
                                         .foregroundStyle(secondaryAccent.opacity(0.65))
+                                        
 
                                     TextField(
                                         "",
@@ -65,16 +66,16 @@ struct ExpenseHistoryView: View {
                                         prompt: Text("Search").foregroundColor(secondaryAccent.opacity(0.5))
                                     )
                                     .foregroundStyle(secondaryAccent)
+                                    .layoutPriority(1)
                                 }
                                 .padding(.horizontal, 14)
-                                .frame(height: 48)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                        .stroke(fieldBorder, lineWidth: 1.5)
-                                }
-
+                                    .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .stroke(fieldBorder, lineWidth: 1.5)
+                                    }
                                 Menu {
                                     Picker("Filter", selection: $selectedCategory) {
                                         ForEach(categories, id: \.self) { category in
@@ -95,6 +96,7 @@ struct ExpenseHistoryView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 }
                             }
+                            .frame(maxWidth: .infinity)
 
                             if filteredExpenses.isEmpty {
                                 VStack(spacing: 10) {

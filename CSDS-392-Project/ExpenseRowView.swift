@@ -16,12 +16,6 @@ struct ExpenseRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
-            Circle()
-                .frame(width: 42, height: 42)
-                .overlay {
-                    Image(systemName: "creditcard.fill")
-                        .font(.system(size: 16))
-                }
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
