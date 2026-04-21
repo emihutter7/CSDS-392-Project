@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct HomeView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var importMessage = ""
     @Query(sort: \Expense.date, order: .reverse) private var expenses: [Expense]
     @Query private var budgets: [Budget]
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
@@ -33,7 +35,7 @@ struct HomeView: View {
         ZStack {
             backgroundColor
                 .ignoresSafeArea()
-
+            
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
                     Text("Home")
@@ -41,23 +43,23 @@ struct HomeView: View {
                         .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 10)
-
+                    
                     Text("Monthly Summary")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
-
+                    
                     SummaryCard(total: totalBudget, spent: totalSpent)
-
+                    
                     NavigationLink {
                         AddExpenseView()
                     } label: {
                         HStack {
                             Spacer()
-
+                            
                             Text("Add Expense")
                                 .font(.system(size: 19, weight: .semibold))
                                 .foregroundStyle(.white)
-
+                            
                             Spacer()
                         }
                         .frame(height: 58)
@@ -65,12 +67,37 @@ struct HomeView: View {
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 2)
-
+                    
+                    Button {
+                        Task {
+                            await importFromTeller()
+                        }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            
+                            Text("Import Bank Transactions")
+                                .font(.system(size: 19, weight: .semibold))
+                                .foregroundStyle(.white)
+                            
+                            Spacer()
+                        }
+                        .frame(height: 58)
+                        .background(Color.blue) // change color later if you want
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    }
+                    .padding(.top, 2)
+                    if !importMessage.isEmpty {
+                        Text(importMessage)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Recent Expenses")
                             .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(secondaryAccent)
-
+                        
                         if recentExpenses.isEmpty {
                             Text("No expenses yet")
                                 .font(.system(size: 18, weight: .medium))
@@ -86,12 +113,12 @@ struct HomeView: View {
                                                 Image(systemName: "creditcard.fill")
                                                     .font(.system(size: 16))
                                             }
-
+                                        
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(expense.title)
                                                 .font(.system(size: 18, weight: .semibold))
                                                 .foregroundStyle(secondaryAccent)
-
+                                            
                                             if !expense.note.isEmpty {
                                                 Text(expense.note)
                                                     .font(.system(size: 14))
@@ -99,9 +126,9 @@ struct HomeView: View {
                                                     .lineLimit(1)
                                             }
                                         }
-
+                                        
                                         Spacer()
-
+                                        
                                         Text(expense.amount.formatted(.currency(code: "USD")))
                                             .font(.system(size: 17, weight: .semibold))
                                             .foregroundStyle(secondaryAccent)
@@ -120,13 +147,36 @@ struct HomeView: View {
                     .background(cardColor)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                     .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
-
+                    
                     Spacer(minLength: 110)
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+        }
+    }
+        
+    private func importFromTeller() async {
+        let transactions = await MockTellerService.shared.fetchTransactions()
+
+        for transaction in transactions {
+            let expense = Expense(
+                title: transaction.description,
+                amount: transaction.amount,
+                category: transaction.mappedCategory(),
+                date: transaction.date,
+                note: transaction.description
+            )
+            modelContext.insert(expense)
+        }
+
+        do {
+            try modelContext.save()
+            importMessage = "Imported \(transactions.count) transactions."
+        } catch {
+            importMessage = "Failed to save imported transactions."
+            print("ERROR:", error)
         }
     }
 }
