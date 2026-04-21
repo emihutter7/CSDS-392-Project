@@ -55,10 +55,12 @@ struct BudgetEditorView: View {
                         .pickerStyle(.menu)
                         .padding()
                         .background(Color.white)
+                        .frame(maxWidth: .infinity)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay {
                             RoundedRectangle(cornerRadius: 16)
                                 .stroke(fieldBorder, lineWidth: 1.5)
+                                
                         }
 
                         ForEach(categories) { category in

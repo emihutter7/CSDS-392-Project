@@ -41,6 +41,7 @@ struct SummaryCard: View {
 
                     Text("\(Int(progress * 100))%")
                         .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.accentColor)
                 }
 
                 ProgressView(value: progress)
