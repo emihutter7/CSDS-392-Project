@@ -10,7 +10,8 @@ import SwiftData
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var importMessage = ""
+    @State private var showBankLink = false
+
     @Query(sort: \Expense.date, order: .reverse) private var expenses: [Expense]
     @Query private var budgets: [Budget]
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
@@ -34,6 +35,7 @@ struct HomeView: View {
             .filter { $0.type == .income }
             .reduce(0) { $0 + $1.amount }
     }
+
     private var recentExpenses: [Expense] {
         Array(expenses.prefix(5))
     }
@@ -42,7 +44,7 @@ struct HomeView: View {
         ZStack {
             backgroundColor
                 .ignoresSafeArea()
-            
+
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
                     Text("Home")
@@ -50,63 +52,59 @@ struct HomeView: View {
                         .foregroundStyle(secondaryAccent)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 10)
-                    
+
                     Text("Monthly Summary")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
-                    
+
                     SummaryCard(total: totalBudget, spent: totalSpent)
-                    
+
                     NavigationLink {
                         AddExpenseView()
                     } label: {
                         HStack {
                             Spacer()
-                            
+
                             Text("Add Transaction")
                                 .font(.system(size: 19, weight: .semibold))
                                 .foregroundStyle(secondaryAccent)
-                            
+
                             Spacer()
                         }
                         .frame(height: 58)
-                        .background(cardColor) // change color later if you want
+                        .background(cardColor)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 2)
-                    
+
                     Button {
-                        Task {
-                            await importFromTeller()
-                        }
+                        showBankLink = true
                     } label: {
                         HStack {
                             Spacer()
-                            
+
                             Text("Import Bank Transactions")
                                 .font(.system(size: 19, weight: .semibold))
                                 .foregroundStyle(secondaryAccent)
-                            
+
                             Spacer()
                         }
                         .frame(height: 58)
-                        .background(cardColor) // change color later if you want
+                        .background(cardColor)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
                     .padding(.top, 2)
-                    if !importMessage.isEmpty {
-                        Text(importMessage)
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                    .sheet(isPresented: $showBankLink) {
+                        BankLinkView()
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Recent Transactions")
                             .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(secondaryAccent)
                             .frame(maxWidth: .infinity)
-                        
+
                         if recentExpenses.isEmpty {
                             Text("No expenses yet")
                                 .font(.system(size: 18, weight: .medium))
@@ -128,18 +126,16 @@ struct HomeView: View {
                                             Text(expense.title)
                                                 .font(.system(size: 18, weight: .semibold))
                                                 .foregroundStyle(secondaryAccent)
-                                            
                                         }
-                                        
+
                                         Spacer()
-                                        
+
                                         Text(
                                             "\(expense.type == .income ? "+" : "-")" +
                                             String(format: "$%.2f", expense.amount)
                                         )
-                                        .foregroundStyle(expense.type == .income ? Color.green : secondaryAccent)
-                                            .font(.system(size: 17, weight: .semibold))
-                                            .foregroundStyle(secondaryAccent)
+                                        .foregroundStyle(expense.type == .income ? .green : secondaryAccent)
+                                        .font(.system(size: 17, weight: .semibold))
                                     }
                                     .padding(14)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -155,39 +151,13 @@ struct HomeView: View {
                     .background(cardColor)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                     .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
-                    
+
                     Spacer(minLength: 110)
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-        }
-    }
-        
-    private func importFromTeller() async {
-        let transactions = await MockTellerService.shared.fetchTransactions()
-
-        for transaction in transactions {
-            let type: TransactionType = transaction.amount > 0 ? .income : .expense
-
-            let expense = Expense(
-                title: transaction.description,
-                amount: abs(transaction.amount),
-                category: transaction.mappedCategory(),
-                date: transaction.date,
-                note: transaction.description,
-                type: type
-            )
-            modelContext.insert(expense)
-        }
-
-        do {
-            try modelContext.save()
-            importMessage = "Imported \(transactions.count) transactions."
-        } catch {
-            importMessage = "Failed to save imported transactions."
-            print("ERROR:", error)
         }
     }
 }
