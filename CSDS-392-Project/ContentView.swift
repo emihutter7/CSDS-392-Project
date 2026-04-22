@@ -12,60 +12,46 @@ struct ContentView: View {
     @Environment(AuthModel.self) private var authModel
     @State private var selectedTab = 0
 
-
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 HomeView()
-            }
-            .tabItem {
+            }.tabItem {
                 Image(systemName: "house.fill")
                 Text("Home")
-            }
-            .tag(0)
-            
-            NavigationStack {
-                ExpenseHistoryView()
-            }
-            .tabItem {
-                Image(systemName: "dollarsign.circle")
-                Text("Transactions")
-            }
-            .tag(1)
+            }.tag(0)
 
             NavigationStack {
-                AddExpenseView()
-            }
-            .tabItem {
+                ExpenseHistoryView()
+            }.tabItem {
+                Image(systemName: "dollarsign.circle")
+                Text("Transactions")
+            }.tag(1)
+
+            NavigationStack {
+                AddExpenseView(selectedTab: $selectedTab)
+            }.tabItem {
                 Image(systemName: "plus.circle.fill")
                 Text("Add")
-            }
-            .tag(2)
+            }.tag(2)
 
             NavigationStack {
                 ReportsView()
-            }
-            .tabItem {
+            }.tabItem {
                 Image(systemName: "chart.bar")
                 Text("Reports")
-            }
-            .tag(3)
+            }.tag(3)
 
             NavigationStack {
                 SettingsView()
-            }
-            .tabItem {
+            }.tabItem {
                 Image(systemName: "gearshape.fill")
                 Text("Settings")
-            }
-            .tag(4)
+            }.tag(4)
         }
     }
 }
 
-
-
 #Preview {
-    ContentView()
-        .environment(AuthModel())
+    ContentView().environment(AuthModel())
 }

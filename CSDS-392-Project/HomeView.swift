@@ -11,6 +11,7 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showBankLink = false
+    @State private var viewModel = HomeViewModel()
 
     @Query(sort: \Expense.date, order: .reverse) private var expenses: [Expense]
     @Query private var budgets: [Budget]
@@ -20,103 +21,119 @@ struct HomeView: View {
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let cardColor = Color.white
 
-    private var budgetPeriod: String {
-        budgets.first?.incomePeriod ?? "Monthly"
-    }
-
-    private var totalBudget: Double {
-        categoryBudgets.reduce(0) { $0 + $1.budgetAmount }
-    }
-
-    private var totalSpent: Double {
-        DateFilterHelper.filter(
-            expenses.filter { $0.type == .expense },
-            for: budgetPeriod
-        ).reduce(0) { $0 + $1.amount }
-    }
-
-    private var totalIncome: Double {
-        DateFilterHelper.filter(
-            expenses.filter { $0.type == .income },
-            for: budgetPeriod
-        ).reduce(0) { $0 + $1.amount }
-    }
-
-    private var recentExpenses: [Expense] {
-        Array(expenses.prefix(5))
-    }
-
     var body: some View {
         ZStack {
             backgroundColor.ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
-                VStack(alignment:.leading, spacing: 22) {
-                    Text("Home").font(.system(size: 32, weight:.semibold)).foregroundStyle(secondaryAccent).frame(maxWidth:.infinity, alignment:.center).padding(.top, 10)
+                VStack(alignment: .leading, spacing: 22) {
 
-                    Text("\(budgetPeriod) Summary").font(.system(size: 24, weight:.semibold)).foregroundStyle(secondaryAccent)
+                    Text("Home")
+                        .font(.system(size: 32, weight: .semibold))
+                        .foregroundStyle(secondaryAccent)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 10)
 
-                    SummaryCard(total: totalBudget, spent: totalSpent)
+                    Text("\(viewModel.budgetPeriod(from: budgets)) Summary")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(secondaryAccent)
+
+                    SummaryCard(
+                        total: viewModel.totalBudget(from: categoryBudgets),
+                        spent: viewModel.totalSpent(from: expenses, budgets: budgets)
+                    )
 
                     NavigationLink {
-                        AddExpenseView()
+                        AddExpenseView(selectedTab:.constant(2))
                     } label: {
                         HStack {
                             Spacer()
-                            Text("Add Transaction").font(.system(size: 19, weight:.semibold)).foregroundStyle(secondaryAccent)
+                            Text("Add Transaction")
+                                .font(.system(size: 19, weight: .semibold))
+                                .foregroundStyle(secondaryAccent)
                             Spacer()
-                        }.frame(height: 58).background(cardColor).clipShape(RoundedRectangle(cornerRadius: 18, style:.continuous))
-                    }.buttonStyle(.plain).padding(.top, 2)
+                        }
+                        .frame(height: 58)
+                        .background(cardColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 2)
 
                     Button {
                         showBankLink = true
                     } label: {
                         HStack {
                             Spacer()
-                            Text("Import Bank Transactions").font(.system(size: 19, weight:.semibold)).foregroundStyle(secondaryAccent)
+                            Text("Import Bank Transactions")
+                                .font(.system(size: 19, weight: .semibold))
+                                .foregroundStyle(secondaryAccent)
                             Spacer()
-                        }.frame(height: 58).background(cardColor).clipShape(RoundedRectangle(cornerRadius: 18, style:.continuous))
-                    }.padding(.top, 2).sheet(isPresented: $showBankLink) {
+                        }
+                        .frame(height: 58)
+                        .background(cardColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    }
+                    .padding(.top, 2)
+                    .sheet(isPresented: $showBankLink) {
                         BankLinkView()
                     }
 
-                    VStack(alignment:.leading, spacing: 16) {
-                        Text("Recent Transactions").font(.system(size: 24, weight:.semibold)).foregroundStyle(secondaryAccent).frame(maxWidth:.infinity)
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Recent Transactions")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(secondaryAccent)
+                            .frame(maxWidth: .infinity)
 
-                        if recentExpenses.isEmpty {
-                            Text("No expenses yet").font(.system(size: 18, weight:.medium)).foregroundStyle(secondaryAccent.opacity(0.65)).padding(.vertical, 8)
+                        let recent = viewModel.recentExpenses(from: expenses)
+
+                        if recent.isEmpty {
+                            Text("No expenses yet")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(secondaryAccent.opacity(0.65))
+                                .padding(.vertical, 8)
                         } else {
                             VStack(spacing: 12) {
-                                ForEach(recentExpenses) { expense in
+                                ForEach(recent) { expense in
                                     HStack(alignment: .top, spacing: 12) {
                                         Circle()
                                             .frame(width: 42, height: 42)
                                             .foregroundStyle(Color.accentColor)
                                             .overlay {
-                                                Image(systemName: expense.type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                                                Image(systemName: viewModel.iconName(for: expense.type))
                                                     .font(.system(size: 16))
                                             }
 
-                                        VStack(alignment:.leading, spacing: 4) {
-                                            Text(expense.title).font(.system(size: 18, weight:.semibold)).foregroundStyle(secondaryAccent)
-                                        }
+                                        Text(expense.title)
+                                            .font(.system(size: 18, weight: .semibold))
+                                            .foregroundStyle(secondaryAccent)
 
                                         Spacer()
 
-                                        Text(
-                                            "\(expense.type == .income ? "+" : "-")" +
-                                            String(format: "$%.2f", expense.amount)
-                                        ).foregroundStyle(expense.type == .income ?.green : secondaryAccent).font(.system(size: 17, weight:.semibold))
-                                    }.padding(14).frame(maxWidth:.infinity, alignment:.leading).background(
-                                        RoundedRectangle(cornerRadius: 16, style:.continuous).fill(backgroundColor)
+                                        Text(viewModel.amountText(for: expense))
+                                            .foregroundStyle(viewModel.amountColor(for: expense.type))
+                                            .font(.system(size: 17, weight: .semibold))
+                                    }
+                                    .padding(14)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .fill(backgroundColor)
                                     )
                                 }
                             }
                         }
-                    }.padding(18).background(cardColor).clipShape(RoundedRectangle(cornerRadius: 24, style:.continuous)).shadow(color:.black.opacity(0.05), radius: 12, y: 6)
+                    }
+                    .padding(18)
+                    .background(cardColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
 
                     Spacer(minLength: 110)
-                }.padding(.horizontal, 20).padding(.bottom, 30).frame(maxWidth:.infinity, alignment:.leading)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
