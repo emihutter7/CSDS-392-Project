@@ -43,12 +43,17 @@ final class BankImportViewModel {
                 for transaction in transactions {
                     guard let amount = Double(transaction.amount) else { continue }
 
-                    let transactionType: TransactionType = amount < 0 ? .expense : .income
+                    let transactionType: TransactionType = amount < 0 ?.expense :.income
+
+                    let mappedCategory = mapTellerCategory(
+                        transaction.details?.category,
+                        type: transactionType
+                    )
 
                     let importedTransaction = Expense(
                         title: transaction.description,
                         amount: abs(amount),
-                        category: transaction.details?.category ?? (transactionType == .income ? "Income" : "Imported"),
+                        category: mappedCategory,
                         date: parsedDate(transaction.date) ?? Date(),
                         note: transaction.description,
                         type: transactionType
@@ -63,6 +68,28 @@ final class BankImportViewModel {
             statusMessage = "Imported \(importedCount) transactions."
         } catch {
             statusMessage = "Import failed: \(error.localizedDescription)"
+        }
+    }
+
+    private func mapTellerCategory(_ tellerCategory: String?, type: TransactionType) -> String {
+
+        if type == .income { return "Income" }
+
+        guard let category = tellerCategory?.lowercased() else { return "General" }
+
+        switch category {
+        case "dining", "bar", "groceries":
+            return "Food"
+        case "utilities", "phone", "insurance", "loan", "service", "tax":
+            return "Bills"
+        case "entertainment", "sport", "education", "software":
+            return "Entertainment"
+        case "shopping", "clothing", "electronics":
+            return "Shopping"
+        case "transport", "transportation", "fuel":
+            return "Transportation"
+        default:
+            return "General"
         }
     }
 
