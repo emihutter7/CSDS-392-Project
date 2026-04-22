@@ -136,13 +136,6 @@ struct ExpenseHistoryView: View {
                                                         .font(.system(size: 13))
                                                         .foregroundStyle(secondaryAccent.opacity(0.8))
                                                 }
-
-                                                if !expense.note.isEmpty {
-                                                    Text(expense.note)
-                                                        .font(.system(size: 13))
-                                                        .foregroundStyle(secondaryAccent.opacity(0.75))
-                                                        .lineLimit(2)
-                                                }
                                             }
 
                                             Spacer()
@@ -186,7 +179,7 @@ struct ExpenseHistoryView: View {
     }
 
     private func iconName(for type: TransactionType) -> String {
-        type == .income ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
+        type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill"
     }
 
     private func iconBackground(for type: TransactionType) -> Color {

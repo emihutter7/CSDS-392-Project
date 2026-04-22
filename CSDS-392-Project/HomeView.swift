@@ -12,7 +12,7 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showBankLink = false
 
-    @Query(sort: \Expense.date, order:.reverse) private var expenses: [Expense]
+    @Query(sort: \Expense.date, order: .reverse) private var expenses: [Expense]
     @Query private var budgets: [Budget]
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
@@ -88,9 +88,13 @@ struct HomeView: View {
                         } else {
                             VStack(spacing: 12) {
                                 ForEach(recentExpenses) { expense in
-                                    HStack(alignment:.top, spacing: 12) {
-                                        Circle().frame(width: 42, height: 42).foregroundStyle(Color.accentColor).overlay {
-                                                Image(systemName: expense.type == .income ? "arrow.down.circle.fill" : "arrow.up.circle.fill").font(.system(size: 16))
+                                    HStack(alignment: .top, spacing: 12) {
+                                        Circle()
+                                            .frame(width: 42, height: 42)
+                                            .foregroundStyle(Color.accentColor)
+                                            .overlay {
+                                                Image(systemName: expense.type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                                                    .font(.system(size: 16))
                                             }
 
                                         VStack(alignment:.leading, spacing: 4) {
