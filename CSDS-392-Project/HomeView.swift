@@ -118,7 +118,7 @@ struct HomeView: View {
                                             .frame(width: 42, height: 42)
                                             .foregroundStyle(Color.accentColor)
                                             .overlay {
-                                                Image(systemName: expense.type == .income ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
+                                                Image(systemName: expense.type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
                                                     .font(.system(size: 16))
                                             }
 
