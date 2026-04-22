@@ -43,23 +43,18 @@ final class BankImportViewModel {
                 for transaction in transactions {
                     guard let amount = Double(transaction.amount) else { continue }
 
-                    if amount < 0 {
-                        let expense = Expense(
-                            title: transaction.description,
-                            amount: abs(amount),
-                            category: transaction.details?.category ?? "Imported",
-                            date: isoDate(transaction.date) ?? Date()
-                        )
-                        modelContext.insert(expense)
-                    } else if amount > 0 {
-                        let income = Income(
-                            amount: amount,
-                            source: transaction.description,
-                            date: isoDate(transaction.date) ?? Date()
-                        )
-                        modelContext.insert(income)
-                    }
+                    let transactionType: TransactionType = amount < 0 ? .expense : .income
 
+                    let importedTransaction = Expense(
+                        title: transaction.description,
+                        amount: abs(amount),
+                        category: transaction.details?.category ?? (transactionType == .income ? "Income" : "Imported"),
+                        date: parsedDate(transaction.date) ?? Date(),
+                        note: transaction.description,
+                        type: transactionType
+                    )
+
+                    modelContext.insert(importedTransaction)
                     importedCount += 1
                 }
             }
@@ -71,8 +66,16 @@ final class BankImportViewModel {
         }
     }
 
-    private func isoDate(_ string: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
+    private func parsedDate(_ string: String) -> Date? {
+        let isoFormatter = ISO8601DateFormatter()
+        if let date = isoFormatter.date(from: string) {
+            return date
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter.date(from: string)
     }
 }

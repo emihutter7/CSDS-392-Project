@@ -17,10 +17,13 @@ struct ReportsView: View {
     private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
 
     private var categoryTotals: [String: Double] {
-        Dictionary(grouping: expenses, by: { $0.category })
-            .mapValues { items in
-                items.reduce(0) { $0 + $1.amount }
-            }
+        Dictionary(
+            grouping: expenses.filter { $0.type == .expense },
+            by: { $0.category }
+        )
+        .mapValues { items in
+            items.reduce(0) { $0 + $1.amount }
+        }
     }
 
     private var breakdownCategories: [(name: String, spent: Double, budget: Double)] {

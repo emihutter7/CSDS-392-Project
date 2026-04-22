@@ -12,7 +12,7 @@ struct AddExpenseView: View {
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
     
     @State private var title = ""
-    @State private var category = ""
+    @State private var category = "Food"
     @State private var date = Date()
     @State private var amount = ""
     @State private var note = ""
