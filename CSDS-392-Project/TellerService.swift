@@ -6,60 +6,57 @@
 //
 import Foundation
 
-struct MockTellerTransaction: Identifiable {
-    let id: UUID
-    let description: String
-    let amount: Double
-    let date: Date
-
-    init(id: UUID = UUID(), description: String, amount: Double, date: Date) {
-        self.id = id
-        self.description = description
-        self.amount = amount
-        self.date = date
-    }
-
-    func mappedCategory() -> String {
-        let text = description.lowercased()
-
-        if text.contains("uber") || text.contains("lyft") || text.contains("bus") || text.contains("train") {
-            return "Transportation"
-        } else if text.contains("shell") || text.contains("bp") || text.contains("exxon") || text.contains("gas") {
-            return "Gas"
-        } else if text.contains("rent") || text.contains("lease") || text.contains("apartment") {
-            return "Rent"
-        } else if text.contains("restaurant") || text.contains("cafe") || text.contains("doordash") || text.contains("ubereats") || text.contains("grocery") {
-            return "Food"
-        } else if text.contains("spotify") || text.contains("netflix") || text.contains("subscription") {
-            return "Subscriptions"
-        } else if text.contains("hospital") || text.contains("pharmacy") || text.contains("cvs") || text.contains("walgreens") {
-            return "Healthcare"
-        } else if text.contains("electric") || text.contains("water") || text.contains("internet") || text.contains("utility") {
-            return "Utilities"
-        } else if text.contains("amazon") || text.contains("target") || text.contains("walmart") {
-            return "Shopping"
-        } else if text.contains("movie") || text.contains("bar") || text.contains("concert") {
-            return "Entertainment"
-        } else {
-            return "Other"
-        }
-    }
-}
-
-final class MockTellerService {
-    static let shared = MockTellerService()
-
+final class TellerService {
+    static let shared = TellerService()
     private init() {}
 
-    func fetchTransactions() async -> [MockTellerTransaction] {
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+    private let baseURL = URL(string: "https://api.teller.io")!
 
-        return [
-            MockTellerTransaction(description: "Uber Ride", amount: 18.75, date: Date()),
-            MockTellerTransaction(description: "Shell Gas", amount: 42.10, date: Date().addingTimeInterval(-86400)),
-            MockTellerTransaction(description: "Spotify Subscription", amount: 10.99, date: Date().addingTimeInterval(-172800)),
-            MockTellerTransaction(description: "Grocery Store", amount: 84.32, date: Date().addingTimeInterval(-259200)),
-            MockTellerTransaction(description: "Target Purchase", amount: 36.45, date: Date().addingTimeInterval(-345600))
-        ]
+    func saveAccessToken(_ token: String) {
+        UserDefaults.standard.set(token, forKey: "tellerSandboxAccessToken")
+    }
+
+    func loadAccessToken() -> String? {
+        UserDefaults.standard.string(forKey: "tellerSandboxAccessToken")
+    }
+
+    func clearAccessToken() {
+        UserDefaults.standard.removeObject(forKey: "tellerSandboxAccessToken")
+    }
+
+    private func makeRequest(path: String, accessToken: String) throws -> URLRequest {
+        let url = baseURL.appendingPathComponent(path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        let authString = "\(accessToken):"
+        let authData = Data(authString.utf8)
+        let encoded = authData.base64EncodedString()
+
+        request.setValue("Basic \(encoded)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        return request
+    }
+
+    func fetchAccounts(accessToken: String) async throws -> [TellerAccount] {
+        let request = try makeRequest(path: "accounts", accessToken: accessToken)
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
+            throw URLError(.badServerResponse)
+        }
+
+        return try JSONDecoder().decode([TellerAccount].self, from: data)
+    }
+
+    func fetchTransactions(accountId: String, accessToken: String) async throws -> [TellerTransaction] {
+        let request = try makeRequest(path: "accounts/\(accountId)/transactions", accessToken: accessToken)
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
+            throw URLError(.badServerResponse)
+        }
+
+        return try JSONDecoder().decode([TellerTransaction].self, from: data)
     }
 }
