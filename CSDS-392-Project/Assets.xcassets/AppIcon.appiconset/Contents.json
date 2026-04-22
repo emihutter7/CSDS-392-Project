@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "AppIcon.jpeg",
+      "filename" : "clearcushion.001.jpeg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "clearcushion.001 1.jpeg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -24,6 +25,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "clearcushion.001 2.jpeg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
