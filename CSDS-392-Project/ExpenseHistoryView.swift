@@ -186,7 +186,7 @@ struct ExpenseHistoryView: View {
     }
 
     private func iconName(for type: TransactionType) -> String {
-        type == .income ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
+        type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill"
     }
 
     private func iconBackground(for type: TransactionType) -> Color {

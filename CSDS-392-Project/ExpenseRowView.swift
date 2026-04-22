@@ -18,7 +18,7 @@ struct ExpenseRowView: View {
     }
 
     private var iconName: String {
-        expense.type == .income ? "arrow.down.circle.fill" : "creditcard.fill"
+        expense.type == .income ? "arrow.up.circle.fill" : "creditcard.fill"
     }
 
     private var categoryLabel: String {
