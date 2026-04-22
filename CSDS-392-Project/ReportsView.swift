@@ -20,10 +20,7 @@ struct ReportsView: View {
         Dictionary(
             grouping: expenses.filter { $0.type == .expense },
             by: { $0.category }
-        )
-        .mapValues { items in
-            items.reduce(0) { $0 + $1.amount }
-        }
+        ).mapValues { $0.reduce(0) { $0 + $1.amount } }
     }
 
     private var breakdownCategories: [(name: String, spent: Double, budget: Double)] {
@@ -37,9 +34,7 @@ struct ReportsView: View {
     }
 
     private var topCategories: [(category: String, amount: Double)] {
-        categoryTotals
-            .map { (category: $0.key, amount: $0.value) }
-            .sorted { $0.amount > $1.amount }
+        categoryTotals.map { (category: $0.key, amount: $0.value) }.sorted { $0.amount > $1.amount }
     }
 
     private var chartValues: [Double] {

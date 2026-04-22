@@ -233,7 +233,10 @@ struct AddExpenseView: View {
     private func seedDefaultCategories() {
         guard categoryBudgets.isEmpty else { return }
 
-        let defaults = ["Food", "Bills", "Shopping", "Transportation", "Entertainment", "Salary", "Other"]
+        let defaults = [
+            "Food", "Bills", "Shopping", "Transportation",
+            "Entertainment", "General", "Other"
+        ]
 
         for item in defaults {
             modelContext.insert(CategoryBudget(name: item))
@@ -245,8 +248,6 @@ struct AddExpenseView: View {
             print("Failed to seed categories: \(error)")
         }
     }
-    
-    
     
     private func saveTransaction() {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -31,6 +31,8 @@ final class BankImportViewModel {
         defer { isImporting = false }
 
         do {
+            try remapExistingTransactions(modelContext: modelContext)
+
             let accounts = try await TellerService.shared.fetchAccounts(accessToken: accessToken)
             var importedCount = 0
 
@@ -71,8 +73,29 @@ final class BankImportViewModel {
         }
     }
 
-    private func mapTellerCategory(_ tellerCategory: String?, type: TransactionType) -> String {
+    func remapExistingTransactions(modelContext: ModelContext) throws {
+        let tellerRawCategories: Set<String> = [
+            "accommodation", "advertising", "bar", "charity", "clothing",
+            "dining", "education", "electronics", "entertainment", "fuel",
+            "general", "groceries", "health", "home", "insurance",
+            "investment", "loan", "office", "phone", "service", "shopping",
+            "software", "sport", "tax", "transport", "transportation",
+            "utilities", "imported"
+        ]
 
+        let descriptor = FetchDescriptor<Expense>()
+        let allExpenses = try modelContext.fetch(descriptor)
+
+        for expense in allExpenses {
+            if tellerRawCategories.contains(expense.category.lowercased()) {
+                expense.category = mapTellerCategory(expense.category, type: expense.type)
+            }
+        }
+
+        try modelContext.save()
+    }
+
+    private func mapTellerCategory(_ tellerCategory: String?, type: TransactionType) -> String {
         if type == .income { return "Income" }
 
         guard let category = tellerCategory?.lowercased() else { return "General" }
@@ -82,7 +105,7 @@ final class BankImportViewModel {
             return "Food"
         case "utilities", "phone", "insurance", "loan", "service", "tax":
             return "Bills"
-        case "entertainment", "sport", "education", "software":
+        case "entertainment", "sport", "software":
             return "Entertainment"
         case "shopping", "clothing", "electronics":
             return "Shopping"
@@ -95,9 +118,7 @@ final class BankImportViewModel {
 
     private func parsedDate(_ string: String) -> Date? {
         let isoFormatter = ISO8601DateFormatter()
-        if let date = isoFormatter.date(from: string) {
-            return date
-        }
+        if let date = isoFormatter.date(from: string) { return date }
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"

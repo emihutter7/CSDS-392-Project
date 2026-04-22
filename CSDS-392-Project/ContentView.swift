@@ -29,7 +29,7 @@ struct ContentView: View {
             }
             .tabItem {
                 Image(systemName: "dollarsign.circle")
-                Text("Expenses")
+                Text("Transactions")
             }
             .tag(1)
 
