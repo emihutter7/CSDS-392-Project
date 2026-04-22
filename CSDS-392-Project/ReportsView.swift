@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Charts
 
 struct ReportsView: View {
     @Query(sort: \Expense.date, order:.reverse) private var expenses: [Expense]
@@ -16,6 +17,17 @@ struct ReportsView: View {
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
+
+    private let chartColors: [Color] = [
+        Color(red: 0.75, green: 0.55, blue: 0.60),
+        Color(red: 0.55, green: 0.43, blue: 0.35),
+        Color(red: 0.88, green: 0.80, blue: 0.81),
+        Color(red: 0.83, green: 0.70, blue: 0.73),
+        Color(red: 0.91, green: 0.86, blue: 0.84),
+        Color(red: 0.65, green: 0.48, blue: 0.50),
+        Color(red: 0.70, green: 0.60, blue: 0.55),
+        Color(red: 0.80, green: 0.72, blue: 0.68)
+    ]
 
     private var budgetPeriod: String {
         budgets.first?.incomePeriod ?? "Monthly"
@@ -45,23 +57,26 @@ struct ReportsView: View {
         }
     }
 
-    private var topCategories: [(category: String, amount: Double)] {
-        categoryTotals.map { (category: $0.key, amount: $0.value) }.sorted { $0.amount > $1.amount }
-    }
-
-    private var chartValues: [Double] {
-        let values = breakdownCategories.map { $0.spent }.filter { $0 > 0 }
-        return values.isEmpty ? [1] : values
+    private var chartData: [(name: String, amount: Double, color: Color)] {
+        categoryTotals.filter { $0.value > 0 }.sorted { $0.value > $1.value }.enumerated().map { index, item in
+                (
+                    name: item.key,
+                    amount: item.value,
+                    color: chartColors[index % chartColors.count]
+                )
+            }
     }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment:.leading, spacing: 22) {
+
                 Text("Reports").font(.system(size: 30, weight:.semibold)).foregroundStyle(secondaryAccent).frame(maxWidth:.infinity, alignment:.center).padding(.top, 10)
 
-                Text("\(budgetPeriod) Budget Breakdown").font(.system(size: 24, weight:.semibold)).foregroundStyle(secondaryAccent).frame(maxWidth:.infinity)
-
+                // MARK: — Budget Breakdown
                 VStack(alignment:.leading, spacing: 18) {
+                    Text("\(budgetPeriod) Budget Breakdown").font(.system(size: 24, weight:.semibold)).foregroundStyle(secondaryAccent).frame(maxWidth:.infinity)
+
                     if breakdownCategories.isEmpty {
                         Text("No categories set yet").font(.system(size: 17, weight:.medium)).foregroundStyle(secondaryAccent.opacity(0.7)).frame(maxWidth:.infinity)
                     } else {
@@ -70,12 +85,9 @@ struct ReportsView: View {
                                 VStack(alignment:.leading, spacing: 10) {
                                     HStack {
                                         Text(item.name).font(.system(size: 18, weight:.semibold)).foregroundStyle(secondaryAccent)
-
                                         Spacer()
-
                                         Text("\(item.spent, format:.currency(code: "USD")) / \(item.budget, format:.currency(code: "USD"))").font(.system(size: 15, weight:.medium)).foregroundStyle(Color.accentColor)
                                     }
-
                                     ProgressView(value: progressValue(spent: item.spent, budget: item.budget)).progressViewStyle(.linear).scaleEffect(y: 1.6)
                                 }.padding(14).background(
                                     RoundedRectangle(cornerRadius: 18, style:.continuous).fill(softBackground)
@@ -86,29 +98,42 @@ struct ReportsView: View {
                 }.padding(18).background(Color.white).clipShape(RoundedRectangle(cornerRadius: 24, style:.continuous)).shadow(color:.black.opacity(0.05), radius: 12, y: 6)
 
                 VStack(alignment:.leading, spacing: 18) {
-                    
                     Text("\(budgetPeriod) Report").font(.system(size: 24, weight:.semibold)).foregroundStyle(secondaryAccent)
 
-                    HStack(alignment:.top, spacing: 24) {
-                        CircleChartView(values: chartValues, lineWidth: 18).frame(width: 160, height: 160)
+                    if chartData.isEmpty {
+                        Text("No expenses this \(budgetPeriod.lowercased()) yet").font(.system(size: 16, weight:.medium)).foregroundStyle(secondaryAccent.opacity(0.7)).frame(maxWidth:.infinity, alignment:.center).padding(.vertical, 20)
+                    } else {
 
-                        VStack(alignment:.leading, spacing: 14) {
-                            Text("Top Categories").font(.system(size: 20, weight:.semibold)).foregroundStyle(secondaryAccent)
+                        Chart(chartData, id: \.name) { item in
+                            SectorMark(
+                                angle:.value("Amount", item.amount),
+                                innerRadius:.ratio(0.5),
+                                angularInset: 2
+                            ).foregroundStyle(item.color).cornerRadius(4)
+                        }.frame(height: 260).padding(.vertical, 8)
 
-                            if topCategories.isEmpty {
-                                Text("No expenses yet").font(.system(size: 16, weight:.medium)).foregroundStyle(secondaryAccent.opacity(0.7))
-                            } else {
-                                ForEach(topCategories.prefix(3), id: \.category) { item in
-                                    VStack(alignment:.leading, spacing: 4) {
-                                        Text(item.category).font(.system(size: 17, weight:.semibold)).foregroundStyle(secondaryAccent)
+                        VStack(alignment:.leading, spacing: 10) {
+                            ForEach(chartData, id: \.name) { item in
+                                HStack(spacing: 10) {
+                                    
+                                    RoundedRectangle(cornerRadius: 4).fill(item.color).frame(width: 14, height: 14)
 
-                                        Text(item.amount, format:.currency(code: "USD")).font(.system(size: 15, weight:.medium))
-                                    }
+                                    Text(item.name).font(.system(size: 15, weight:.semibold)).foregroundStyle(secondaryAccent)
+
+                                    Spacer()
+
+                                    Text(item.amount, format:.currency(code: "USD")).font(.system(size: 15, weight:.medium)).foregroundStyle(secondaryAccent.opacity(0.8))
+
+                                    let total = chartData.reduce(0) { $0 + $1.amount }
+                                    let percent = total > 0 ? (item.amount / total * 100) : 0
+                                    Text("(\(Int(percent))%)").font(.system(size: 13, weight:.medium)).foregroundStyle(secondaryAccent.opacity(0.55))
+                                }.padding(.horizontal, 4)
+
+                                if item.name != chartData.last?.name {
+                                    Divider().background(secondaryAccent.opacity(0.15))
                                 }
                             }
-                        }
-
-                        Spacer()
+                        }.padding(14).background(softBackground).clipShape(RoundedRectangle(cornerRadius: 16, style:.continuous))
                     }
                 }.padding(18).background(Color.white).clipShape(RoundedRectangle(cornerRadius: 24, style:.continuous)).shadow(color:.black.opacity(0.05), radius: 12, y: 6)
 
@@ -124,5 +149,5 @@ struct ReportsView: View {
 }
 
 #Preview {
-    ReportsView()
+    ReportsView().modelContainer(for: [Expense.self, CategoryBudget.self, Budget.self], inMemory: true)
 }
