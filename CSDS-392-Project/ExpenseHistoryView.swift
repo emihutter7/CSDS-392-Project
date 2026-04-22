@@ -136,13 +136,6 @@ struct ExpenseHistoryView: View {
                                                         .font(.system(size: 13))
                                                         .foregroundStyle(secondaryAccent.opacity(0.8))
                                                 }
-
-                                                if !expense.note.isEmpty {
-                                                    Text(expense.note)
-                                                        .font(.system(size: 13))
-                                                        .foregroundStyle(secondaryAccent.opacity(0.75))
-                                                        .lineLimit(2)
-                                                }
                                             }
 
                                             Spacer()
