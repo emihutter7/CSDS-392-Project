@@ -116,7 +116,7 @@ struct ReportsView: View {
                             .foregroundStyle(secondaryAccent)
 
                         if chart.isEmpty {
-                            Text("No expenses this \(period.lowercased()) yet")
+                            Text("No expenses this \(period) yet")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(secondaryAccent.opacity(0.7))
                                 .frame(maxWidth: .infinity, alignment: .center)

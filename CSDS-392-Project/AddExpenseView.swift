@@ -100,7 +100,7 @@ struct AddExpenseView: View {
                 }
 
                 if viewModel.showSavedMessage {
-                    Text("\(viewModel.transactionType.rawValue) saved").foregroundStyle(secondaryAccent).frame(maxWidth:.infinity, alignment:.center)
+                    Text("Saved!").foregroundStyle(secondaryAccent).frame(maxWidth:.infinity, alignment:.center)
                 }
 
                 Spacer(minLength: 100)

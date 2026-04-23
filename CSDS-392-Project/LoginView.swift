@@ -33,7 +33,7 @@ struct LoginView: View {
                     Spacer()
 
                     VStack(spacing: 12) {
-                        Text("Welcome Back")
+                        Text("Welcome!")
                             .font(.system(size: 30, weight: .semibold))
                             .foregroundStyle(secondaryAccent)
 
