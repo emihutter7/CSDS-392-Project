@@ -1,5 +1,7 @@
 # ClearCushion
 
+## Authors: Alexandra Twitty, Emi Hutter-Demarco, Iciar Sanz
+
 ## Setup Instructions
 
 Test login:
