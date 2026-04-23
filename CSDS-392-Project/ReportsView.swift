@@ -18,10 +18,9 @@ struct ReportsView: View {
 
     @State private var viewModel = ReportsViewModel()
 
-    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
-    private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
+    private let backgroundColor = Color("AppBackground")
+    private let secondaryAccent = Color("SecondaryAccent")
+    private let softBackground = Color("SoftBackground")
 
     var body: some View {
         NavigationStack {
@@ -48,10 +47,10 @@ struct ReportsView: View {
                                 Text("Edit")
                             }
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(accentColor)
+                            .foregroundStyle(Color.accentColor)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 7)
-                            .background(accentColor.opacity(0.12))
+                            .background(Color.accentColor.opacity(0.12))
                             .clipShape(Capsule())
                         }
                     }
@@ -74,7 +73,7 @@ struct ReportsView: View {
                                         .foregroundStyle(.white)
                                         .padding(.horizontal, 24)
                                         .padding(.vertical, 10)
-                                        .background(accentColor)
+                                        .background(Color.accentColor)
                                         .clipShape(Capsule())
                                 }
                             }
@@ -184,7 +183,7 @@ struct ReportsView: View {
                 let viewModel = BankImportViewModel()
                 await viewModel.importTransactions(modelContext: modelContext)
             }
-            .background(backgroundColor.ignoresSafeArea())
+            .background(backgroundColor).ignoresSafeArea(.container, edges: .bottom)
         }
     }
 }

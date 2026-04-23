@@ -24,9 +24,9 @@ struct EditExpenseView: View {
     @State private var newCategoryTitle = ""
     @State private var showAddCategoryField = false
 
-    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
-    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+    private let backgroundColor = Color("AppBackground")
+    private let secondaryAccent = Color("SecondaryAccent")
+    private let fieldBorder = Color("FieldBorder")
 
     private var categories: [String] {
         let saved = categoryBudgets.map(\.name)
@@ -303,3 +303,4 @@ struct EditExpenseView: View {
         }
     }
 }
+

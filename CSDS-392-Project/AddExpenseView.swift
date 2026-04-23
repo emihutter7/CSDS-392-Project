@@ -15,9 +15,9 @@ struct AddExpenseView: View {
     @Binding var selectedTab: Int
     @State private var viewModel = AddExpenseViewModel()
 
-    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
-    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+    private let backgroundColor = Color("AppBackground")
+    private let secondaryAccent = Color("SecondaryAccent")
+    private let fieldBorder = Color("FieldBorder")
 
     private var amountColor: Color {
         viewModel.transactionType == .income ?.green : Color.accentColor

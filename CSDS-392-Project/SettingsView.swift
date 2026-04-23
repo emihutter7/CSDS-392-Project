@@ -13,10 +13,10 @@ struct SettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
     @State private var showLogoutAlert = false
 
-    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
-    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
-    private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
+    private let backgroundColor = Color("AppBackground")
+    private let secondaryAccent = Color("SecondaryAccent")
+    private let fieldBorder = Color("FieldBorder")
+    private let softBackground = Color("SoftBackground")
 
     var body: some View {
         NavigationStack {

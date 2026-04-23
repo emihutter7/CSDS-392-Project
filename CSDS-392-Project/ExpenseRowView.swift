@@ -10,8 +10,8 @@ import SwiftUI
 struct ExpenseRowView: View {
     let expense: Expense
 
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
-    private let borderColor = Color(red: 0.88, green: 0.80, blue: 0.81)
+    private let secondaryAccent = Color("SecondaryAccent")
+    private let borderColor = Color("FieldBorder")
 
     private var amountColor: Color {
         expense.type == .income ? .green : .accentColor

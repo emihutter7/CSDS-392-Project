@@ -11,8 +11,8 @@ struct SummaryCard: View {
     let spent: Double
 
     private let backgroundColor = Color.white
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
-    private let softBackground = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let secondaryAccent = Color("SecondaryAccent")
+    private let softBackground = Color("SoftBackground")
 
     private var remaining: Double {
         max(total - spent, 0)

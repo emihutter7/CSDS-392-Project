@@ -14,10 +14,10 @@ struct LoginView: View {
     @State private var password: String = ""
     @State private var showPassword: Bool = false
 
-    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let backgroundColor = Color("AppBackground")
+    private let secondaryAccent = Color("SecondaryAccent")
     private let softFieldBackground = Color.white
-    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+    private let fieldBorder = Color("FieldBorder")
 
     private var isSignInButtonDisabled: Bool {
         [email, password].contains(where: \.isEmpty)

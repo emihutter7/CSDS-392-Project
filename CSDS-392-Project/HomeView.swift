@@ -17,8 +17,8 @@ struct HomeView: View {
     @Query private var budgets: [Budget]
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
 
-    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let backgroundColor = Color("AppBackground")
+    private let secondaryAccent = Color("SecondaryAccent")
     private let cardColor = Color.white
 
     var body: some View {
