@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "clearcushion.001.jpeg",
+      "filename" : "ClearCushion AppIcon.001.jpeg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "clearcushion.001 1.jpeg",
+      "filename" : "ClearCushion AppIcon Dark.001.jpeg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "clearcushion.001 2.jpeg",
+      "filename" : "ClearCushion AppIcon Tinted.001.jpeg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
