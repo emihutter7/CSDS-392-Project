@@ -21,6 +21,7 @@ final class Expense {
     var date: Date
     var note: String
     var typeRawValue: String
+    var tellerTransactionId: String?
 
     var type: TransactionType {
         get { TransactionType(rawValue: typeRawValue) ?? .expense }
@@ -33,7 +34,8 @@ final class Expense {
         category: String,
         date: Date = Date(),
         note: String = "",
-        type: TransactionType = .expense
+        type: TransactionType = .expense,
+        tellerTransactionId: String? = nil
     ) {
         self.title = title
         self.amount = amount
@@ -41,5 +43,6 @@ final class Expense {
         self.date = date
         self.note = note
         self.typeRawValue = type.rawValue
+        self.tellerTransactionId = tellerTransactionId
     }
 }

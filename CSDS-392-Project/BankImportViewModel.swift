@@ -33,8 +33,13 @@ final class BankImportViewModel {
         do {
             try remapExistingTransactions(modelContext: modelContext)
 
+            let existingDescriptor = FetchDescriptor<Expense>()
+            let allExpenses = try modelContext.fetch(existingDescriptor)
+            let importedIDs = Set(allExpenses.compactMap { $0.tellerTransactionId })
+
             let accounts = try await TellerService.shared.fetchAccounts(accessToken: accessToken)
             var importedCount = 0
+            var skippedCount = 0
 
             for account in accounts {
                 let transactions = try await TellerService.shared.fetchTransactions(
@@ -43,6 +48,12 @@ final class BankImportViewModel {
                 )
 
                 for transaction in transactions {
+
+                    guard !importedIDs.contains(transaction.id) else {
+                        skippedCount += 1
+                        continue
+                    }
+
                     guard let amount = Double(transaction.amount) else { continue }
 
                     let transactionType: TransactionType = amount < 0 ?.expense :.income
@@ -58,7 +69,8 @@ final class BankImportViewModel {
                         category: mappedCategory,
                         date: parsedDate(transaction.date) ?? Date(),
                         note: transaction.description,
-                        type: transactionType
+                        type: transactionType,
+                        tellerTransactionId: transaction.id
                     )
 
                     modelContext.insert(importedTransaction)
@@ -67,7 +79,15 @@ final class BankImportViewModel {
             }
 
             try modelContext.save()
-            statusMessage = "Imported \(importedCount) transactions."
+
+            if importedCount == 0 && skippedCount > 0 {
+                statusMessage = "All transactions already up to date."
+            } else if importedCount == 0 {
+                statusMessage = "No transactions found."
+            } else {
+                statusMessage = "Imported \(importedCount) new transactions."
+            }
+
         } catch {
             statusMessage = "Import failed: \(error.localizedDescription)"
         }
