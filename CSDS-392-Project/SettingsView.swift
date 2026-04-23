@@ -51,6 +51,21 @@ struct SettingsView: View {
                             subtitle: "Enable reminders and alerts",
                             isOn: $notificationsEnabled
                         )
+                        .onChange(of: notificationsEnabled) { _, newValue in
+                            Task {
+                                if newValue {
+                                    let granted = await NotificationManager.shared.requestPermission()
+
+                                    if granted {
+                                        await NotificationManager.shared.scheduleDailyReminder()
+                                    } else {
+                                        notificationsEnabled = false
+                                    }
+                                } else {
+                                    NotificationManager.shared.removeDailyReminder()
+                                }
+                            }
+                        }
                     }.padding(18).background(Color.white).clipShape(RoundedRectangle(cornerRadius: 24, style:.continuous)).shadow(color:.black.opacity(0.05), radius: 12, y: 6)
 
                     Spacer()
