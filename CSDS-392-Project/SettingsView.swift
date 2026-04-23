@@ -10,7 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AuthModel.self) private var authModel
     @AppStorage("darkModeEnabled") private var darkModeEnabled = false
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = true
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @State private var showLogoutAlert = false
 
     private let backgroundColor = Color("AppBackground")
