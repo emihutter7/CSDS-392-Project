@@ -27,7 +27,7 @@ struct ReportsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
 
-                    let period = viewModel.budgetPeriod(from: budgets)
+                    let period = viewModel.periodLabel(from: budgets)
                     let breakdown = viewModel.breakdownItems(
                         expenses: expenses,
                         categoryBudgets: categoryBudgets,

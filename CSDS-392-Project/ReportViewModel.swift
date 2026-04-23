@@ -39,6 +39,28 @@ final class ReportsViewModel {
         budgets.first?.incomePeriod ?? "Monthly"
     }
 
+    func periodLabel(from budgets: [Budget]) -> String {
+        let period = budgetPeriod(from: budgets)
+        let formatter = DateFormatter()
+        let now = Date()
+
+        switch period {
+        case "Weekly":
+            formatter.dateFormat = "MMM d"
+            let start = DateFilterHelper.startDate(for: "Weekly")
+            return "Week of \(formatter.string(from: start))"
+        case "Yearly":
+            formatter.dateFormat = "yyyy"
+            return formatter.string(from: now)
+        case "Daily":
+            formatter.dateFormat = "MMM d, yyyy"
+            return formatter.string(from: now)
+        default:
+            formatter.dateFormat = "MMMM yyyy"
+            return formatter.string(from: now)
+        }
+    }
+
     func periodExpenses(from expenses: [Expense], budgets: [Budget]) -> [Expense] {
         DateFilterHelper.filter(
             expenses.filter { $0.type == .expense },
@@ -69,11 +91,7 @@ final class ReportsViewModel {
     }
 
     func chartData(from expenses: [Expense], budgets: [Budget]) -> [ChartSlice] {
-        categoryTotals(from: expenses, budgets: budgets)
-            .filter { $0.value > 0 }
-            .sorted { $0.value > $1.value }
-            .enumerated()
-            .map { index, item in
+        categoryTotals(from: expenses, budgets: budgets).filter { $0.value > 0 }.sorted { $0.value > $1.value }.enumerated().map { index, item in
                 ChartSlice(
                     name: item.key,
                     amount: item.value,

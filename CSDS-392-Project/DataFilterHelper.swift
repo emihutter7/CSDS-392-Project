@@ -15,13 +15,13 @@ struct DateFilterHelper {
 
         switch period {
         case "Weekly":
-            return calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? now
+            return calendar.dateInterval(of:.weekOfYear, for: now)?.start ?? now
         case "Yearly":
-            return calendar.dateInterval(of: .year, for: now)?.start ?? now
+            return calendar.dateInterval(of:.year, for: now)?.start ?? now
         case "Daily":
             return calendar.startOfDay(for: now)
         default: // "Monthly"
-            return calendar.dateInterval(of: .month, for: now)?.start ?? now
+            return calendar.dateInterval(of:.month, for: now)?.start ?? now
         }
     }
 

@@ -16,6 +16,28 @@ final class HomeViewModel {
         budgets.first?.incomePeriod ?? "Monthly"
     }
 
+    func periodLabel(from budgets: [Budget]) -> String {
+        let period = budgetPeriod(from: budgets)
+        let formatter = DateFormatter()
+        let now = Date()
+
+        switch period {
+        case "Weekly":
+            formatter.dateFormat = "MMM d"
+            let start = DateFilterHelper.startDate(for: "Weekly")
+            return "Week of \(formatter.string(from: start))"
+        case "Yearly":
+            formatter.dateFormat = "yyyy"
+            return formatter.string(from: now)
+        case "Daily":
+            formatter.dateFormat = "MMM d, yyyy"
+            return formatter.string(from: now)
+        default:
+            formatter.dateFormat = "MMMM yyyy"
+            return formatter.string(from: now)
+        }
+    }
+
     func totalBudget(from categoryBudgets: [CategoryBudget]) -> Double {
         categoryBudgets.reduce(0) { $0 + $1.budgetAmount }
     }

@@ -33,7 +33,7 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 10)
 
-                    Text("\(viewModel.budgetPeriod(from: budgets)) Summary")
+                    Text("\(viewModel.periodLabel(from: budgets)) Summary")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
 
