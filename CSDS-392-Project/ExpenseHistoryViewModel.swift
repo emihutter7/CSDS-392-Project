@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 enum TransactionFilter: String, CaseIterable, Identifiable {
     case all = "All"
@@ -41,6 +42,11 @@ final class ExpenseHistoryViewModel {
         }
     }
 
+    func delete(_ expense: Expense, context: ModelContext) {
+        context.delete(expense)
+        try? context.save()
+    }
+    
     func amountText(for expense: Expense) -> String {
         let prefix = expense.type == .income ? "+" : "-"
         return "\(prefix)$\(String(format: "%.2f", expense.amount))"

@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ExpenseHistoryView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Expense.date, order:.reverse) private var expenses: [Expense]
     @State private var viewModel = ExpenseHistoryViewModel()
 
@@ -41,46 +42,51 @@ struct ExpenseHistoryView: View {
 
                     let filtered = viewModel.filteredExpenses(from: expenses)
 
+                    // MARK: — Empty State
                     if filtered.isEmpty {
                         VStack(spacing: 10) {
                             Image(systemName: "tray").font(.system(size: 34)).foregroundStyle(secondaryAccent.opacity(0.55))
                             Text("No transactions found").font(.headline).foregroundStyle(secondaryAccent)
                             Text("Try changing the filters or add a new transaction.").font(.subheadline).foregroundStyle(secondaryAccent.opacity(0.7)).multilineTextAlignment(.center)
                         }.frame(maxWidth:.infinity, maxHeight:.infinity).padding(.horizontal, 24)
+
                     } else {
-                        ScrollView(showsIndicators: false) {
-                            LazyVStack(spacing: 14) {
-                                ForEach(filtered) { expense in
-                                    NavigationLink {
-                                        EditExpenseView(expense: expense)
-                                    } label: {
-                                        HStack(alignment:.center, spacing: 14) {
-                                            ZStack {
-                                                Circle().fill(viewModel.iconBackground(for: expense.type)).frame(width: 48, height: 48)
-                                                Image(systemName: viewModel.iconName(for: expense.type)).font(.system(size: 20, weight:.semibold)).foregroundStyle(viewModel.iconForeground(for: expense.type))
+                        List {
+                            ForEach(filtered) { expense in
+                                NavigationLink {
+                                    EditExpenseView(expense: expense)
+                                } label: {
+                                    HStack(alignment:.center, spacing: 14) {
+                                        ZStack {
+                                            Circle().fill(viewModel.iconBackground(for: expense.type)).frame(width: 48, height: 48)
+                                            Image(systemName: viewModel.iconName(for: expense.type)).font(.system(size: 20, weight:.semibold)).foregroundStyle(viewModel.iconForeground(for: expense.type))
+                                        }
+
+                                        VStack(alignment:.leading, spacing: 6) {
+                                            Text(expense.title).font(.system(size: 17, weight:.semibold)).foregroundStyle(.primary).lineLimit(1)
+
+                                            HStack(spacing: 8) {
+                                                Text(expense.category).font(.system(size: 13, weight:.medium)).foregroundStyle(secondaryAccent)
+                                                Text("•").foregroundStyle(secondaryAccent.opacity(0.5))
+                                                Text(expense.date, style:.date).font(.system(size: 13)).foregroundStyle(secondaryAccent.opacity(0.8))
                                             }
+                                        }
 
-                                            VStack(alignment:.leading, spacing: 6) {
-                                                Text(expense.title).font(.system(size: 17, weight:.semibold)).foregroundStyle(.primary).lineLimit(1)
+                                        Spacer()
 
-                                                HStack(spacing: 8) {
-                                                    Text(expense.category).font(.system(size: 13, weight:.medium)).foregroundStyle(secondaryAccent)
-                                                    Text("•").foregroundStyle(secondaryAccent.opacity(0.5))
-                                                    Text(expense.date, style:.date).font(.system(size: 13)).foregroundStyle(secondaryAccent.opacity(0.8))
-                                                }
-                                            }
-
-                                            Spacer()
-
-                                            VStack(alignment:.trailing, spacing: 6) {
-                                                Text(viewModel.amountText(for: expense)).font(.system(size: 17, weight:.bold)).foregroundStyle(viewModel.amountColor(for: expense.type))
-                                                Text(expense.type.rawValue).font(.system(size: 12, weight:.medium)).foregroundStyle(viewModel.amountColor(for: expense.type).opacity(0.85))
-                                            }
-                                        }.padding(16).background(cardBackground).clipShape(RoundedRectangle(cornerRadius: 20, style:.continuous)).shadow(color:.black.opacity(0.04), radius: 10, y: 4)
-                                    }.buttonStyle(.plain)
+                                        VStack(alignment:.trailing, spacing: 6) {
+                                            Text(viewModel.amountText(for: expense)).font(.system(size: 17, weight:.bold)).foregroundStyle(viewModel.amountColor(for: expense.type))
+                                            Text(expense.type.rawValue).font(.system(size: 12, weight:.medium)).foregroundStyle(viewModel.amountColor(for: expense.type).opacity(0.85))
+                                        }
+                                    }.padding(.vertical, 6)
+                                }.listRowBackground(cardBackground).listRowSeparator(.hidden).listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+                            }
+                            .onDelete { indexSet in
+                                for index in indexSet {
+                                    viewModel.delete(filtered[index], context: modelContext)
                                 }
-                            }.padding(.horizontal, 20).padding(.bottom, 26)
-                        }
+                            }
+                        }.listStyle(.plain).scrollContentBackground(.hidden).background(backgroundColor)
                     }
                 }
             }.navigationTitle("Transaction History").navigationBarTitleDisplayMode(.inline)
