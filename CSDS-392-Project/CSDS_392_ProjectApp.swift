@@ -21,6 +21,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct CSDS_392_ProjectApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var authModel = AuthModel()
+    @AppStorage("darkModeEnabled") private var darkModeEnabled = false
     
     var body: some Scene {
         WindowGroup {
@@ -32,6 +33,7 @@ struct CSDS_392_ProjectApp: App {
                 }
             }
             .environment(authModel)
+            .preferredColorScheme(darkModeEnabled ? .dark : .light)
         }
         .modelContainer(for: [Expense.self, Budget.self, CategoryBudget.self])
     }

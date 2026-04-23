@@ -11,6 +11,7 @@ struct SettingsView: View {
     @Environment(AuthModel.self) private var authModel
     @AppStorage("darkModeEnabled") private var darkModeEnabled = false
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
+    @State private var showLogoutAlert = false
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
@@ -55,12 +56,20 @@ struct SettingsView: View {
                     Spacer()
 
                     Button("Log Out") {
-                        authModel.signOut()
+                        showLogoutAlert = true
                     }.font(.system(size: 17, weight:.semibold)).foregroundStyle(.white).frame(maxWidth:.infinity).frame(height: 54).background(
                         RoundedRectangle(cornerRadius: 18, style:.continuous).fill(Color.accentColor)
                     ).padding(.bottom, 40)
+                        .alert("Are you sure?", isPresented: $showLogoutAlert) {
+                            Button("Cancel", role: .cancel) { }
+                            Button("Log Out", role: .destructive) {
+                                authModel.signOut()
+                            }
+                        } message: {
+                            Text("You will need to sign in again to access your account.")
+                        }
                 }.padding(.horizontal, 20)
-            }.navigationBarHidden(true).preferredColorScheme(darkModeEnabled ?.dark :.light)
+            }.navigationBarHidden(true)
         }
     }
 
