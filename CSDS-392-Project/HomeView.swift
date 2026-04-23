@@ -135,6 +135,10 @@ struct HomeView: View {
                 .padding(.bottom, 30)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .refreshable {
+                let viewModel = BankImportViewModel()
+                await viewModel.importTransactions(modelContext: modelContext)
+            }
         }
     }
 }

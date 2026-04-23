@@ -10,7 +10,9 @@ import SwiftData
 
 struct ExpenseHistoryView: View {
     @Environment(\.modelContext) private var modelContext
+    
     @Query(sort: \Expense.date, order:.reverse) private var expenses: [Expense]
+    
     @State private var viewModel = ExpenseHistoryViewModel()
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
@@ -42,7 +44,6 @@ struct ExpenseHistoryView: View {
 
                     let filtered = viewModel.filteredExpenses(from: expenses)
 
-                    // MARK: — Empty State
                     if filtered.isEmpty {
                         VStack(spacing: 10) {
                             Image(systemName: "tray").font(.system(size: 34)).foregroundStyle(secondaryAccent.opacity(0.55))
@@ -87,6 +88,10 @@ struct ExpenseHistoryView: View {
                                 }
                             }
                         }.listStyle(.plain).scrollContentBackground(.hidden).background(backgroundColor)
+                            .refreshable {
+                                let viewModel = BankImportViewModel()
+                                await viewModel.importTransactions(modelContext: modelContext)
+                            }
                     }
                 }
             }.navigationTitle("Transaction History").navigationBarTitleDisplayMode(.inline)

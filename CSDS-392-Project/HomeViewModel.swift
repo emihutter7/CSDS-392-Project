@@ -12,8 +12,6 @@ import SwiftUI
 @MainActor
 final class HomeViewModel {
 
-    // MARK: - Computed from injected data
-
     func budgetPeriod(from budgets: [Budget]) -> String {
         budgets.first?.incomePeriod ?? "Monthly"
     }
@@ -41,8 +39,6 @@ final class HomeViewModel {
     func recentExpenses(from expenses: [Expense]) -> [Expense] {
         Array(expenses.prefix(5))
     }
-
-    // MARK: - Formatting helpers
 
     func amountText(for expense: Expense) -> String {
         let prefix = expense.type == .income ? "+" : "-"

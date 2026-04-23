@@ -10,6 +10,8 @@ import SwiftData
 import Charts
 
 struct ReportsView: View {
+    @Environment(\.modelContext) private var modelContext
+    
     @Query(sort: \Expense.date, order: .reverse) private var expenses: [Expense]
     @Query(sort: \CategoryBudget.name) private var categoryBudgets: [CategoryBudget]
     @Query private var budgets: [Budget]
@@ -177,6 +179,10 @@ struct ReportsView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
                 .padding(.bottom, 24)
+            }
+            .refreshable {
+                let viewModel = BankImportViewModel()
+                await viewModel.importTransactions(modelContext: modelContext)
             }
             .background(backgroundColor.ignoresSafeArea())
         }
