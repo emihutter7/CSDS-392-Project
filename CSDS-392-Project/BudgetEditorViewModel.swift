@@ -18,6 +18,17 @@ final class BudgetEditorViewModel {
     var showSavedMessage = false
 
     let periods = ["Monthly", "Yearly", "Weekly", "Daily"]
+    
+    let defaultCategories = ["Food", "Bills", "Shopping", "Transportation",
+                             "Entertainment", "General", "Other"]
+    
+    func seedCategories(existing: [CategoryBudget], context: ModelContext) {
+            guard existing.isEmpty else { return }
+            for name in defaultCategories {
+                context.insert(CategoryBudget(name: name))
+            }
+            try? context.save()
+        }
 
     func load(from budgets: [Budget]) {
         if let budget = budgets.first {

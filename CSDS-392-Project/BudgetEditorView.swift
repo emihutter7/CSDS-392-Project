@@ -18,7 +18,6 @@ struct BudgetEditorView: View {
     @State private var viewModel = BudgetEditorViewModel()
 
     private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
-    private let accentColor = Color(red: 0.75, green: 0.55, blue: 0.60)
     private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
     private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
 
@@ -63,7 +62,7 @@ struct BudgetEditorView: View {
                                 viewModel.addCategory(context: modelContext)
                             } label: {
                                 Image(systemName: "plus.circle.fill")
-                                    .foregroundStyle(accentColor)
+                                    .foregroundStyle(Color.accentColor)
                                     .font(.system(size: 26))
                             }
                         }
@@ -82,7 +81,7 @@ struct BudgetEditorView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(accentColor)
+                    .background(Color.accentColor)
                     .clipShape(RoundedRectangle(cornerRadius: 18))
 
                     if viewModel.showSavedMessage {
@@ -98,6 +97,7 @@ struct BudgetEditorView: View {
             }
         }
         .onAppear {
+            viewModel.seedCategories(existing: categories, context: modelContext)
             viewModel.load(from: budgets)
         }
         .onChange(of: budgets) {
@@ -106,7 +106,3 @@ struct BudgetEditorView: View {
     }
 }
 
-#Preview {
-    BudgetEditorView()
-        .modelContainer(for: [Budget.self, CategoryBudget.self], inMemory: true)
-}

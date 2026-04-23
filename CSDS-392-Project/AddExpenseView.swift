@@ -127,7 +127,3 @@ struct AddExpenseView: View {
             }
     }
 }
-
-#Preview {
-    AddExpenseView(selectedTab:.constant(2))
-}

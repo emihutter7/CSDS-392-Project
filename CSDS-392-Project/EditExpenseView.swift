@@ -303,18 +303,3 @@ struct EditExpenseView: View {
         }
     }
 }
-
-#Preview {
-    let sampleExpense = Expense(
-        title: "Lunch",
-        amount: 12.50,
-        category: "Food",
-        date: Date(),
-        note: "Chipotle"
-    )
-
-    return NavigationStack {
-        EditExpenseView(expense: sampleExpense)
-    }
-    .modelContainer(for: [Expense.self, CategoryBudget.self], inMemory: true)
-}
