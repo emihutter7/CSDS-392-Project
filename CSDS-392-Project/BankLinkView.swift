@@ -4,7 +4,6 @@
 //
 //  Created by Alexandra Twitty on 4/21/26.
 //
-
 import SwiftUI
 import SwiftData
 import TellerKit
@@ -14,40 +13,143 @@ struct BankLinkView: View {
     @State private var viewModel = BankImportViewModel()
     @State private var showTeller = false
 
+    private let backgroundColor = Color(red: 0.97, green: 0.95, blue: 0.94)
+    private let cardColor = Color.white
+    private let secondaryAccent = Color(red: 0.55, green: 0.43, blue: 0.35)
+    private let fieldBorder = Color(red: 0.88, green: 0.80, blue: 0.81)
+    private let softBackground = Color(red: 0.99, green: 0.98, blue: 0.97)
+
     var body: some View {
-        VStack(spacing: 20) {
-            Button("Link Bank Account") {
-                showTeller = true
-            }
-            .buttonStyle(.borderedProminent)
+        NavigationStack {
+            ZStack {
+                backgroundColor
+                    .ignoresSafeArea()
 
-            Button {
-                Task {
-                    await viewModel.importTransactions(modelContext: modelContext)
+                VStack(spacing: 24) {
+                    VStack(spacing: 8) {
+                        Text("Import Transactions")
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(secondaryAccent)
+
+                        Text("Securely link your bank account and import recent transactions into your budget tracker.")
+                            .font(.system(size: 15))
+                            .foregroundStyle(secondaryAccent.opacity(0.75))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 8)
+                    }
+
+                    VStack(spacing: 18) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Label("Bank Connection", systemImage: "building.columns.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(secondaryAccent)
+
+                            Text("Connect your bank account to automatically pull in transaction data.")
+                                .font(.system(size: 14))
+                                .foregroundStyle(secondaryAccent.opacity(0.7))
+
+                            Button {
+                                showTeller = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: "link")
+                                    Text("Link Bank Account")
+                                }
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(Color.accentColor)
+                                )
+                            }
+
+                            if let institution = viewModel.linkedInstitutionName {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                    Text("Linked: \(institution)")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundStyle(secondaryAccent)
+                                }
+                                .padding(12)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .fill(softBackground)
+                                )
+                            }
+                        }
+                        .padding(18)
+                        .background(cardColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            Label("Transaction Import", systemImage: "arrow.down.doc.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(secondaryAccent)
+
+                            Text("Once your account is linked, import transactions directly into the app.")
+                                .font(.system(size: 14))
+                                .foregroundStyle(secondaryAccent.opacity(0.7))
+
+                            Button {
+                                Task {
+                                    await viewModel.importTransactions(modelContext: modelContext)
+                                }
+                            } label: {
+                                HStack {
+                                    if viewModel.isImporting {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Image(systemName: "square.and.arrow.down")
+                                        Text("Import Transactions")
+                                    }
+                                }
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(viewModel.isImporting ? Color.gray.opacity(0.6) : secondaryAccent)
+                                )
+                            }
+                            .disabled(viewModel.isImporting)
+                        }
+                        .padding(18)
+                        .background(cardColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
+
+                        if !viewModel.statusMessage.isEmpty {
+                            Text(viewModel.statusMessage)
+                                .font(.system(size: 14))
+                                .foregroundStyle(secondaryAccent)
+                                .multilineTextAlignment(.center)
+                                .padding(14)
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(softBackground)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(fieldBorder, lineWidth: 1)
+                                )
+                        }
+
+                        Spacer()
+                    }
                 }
-            } label: {
-                if viewModel.isImporting {
-                    ProgressView()
-                } else {
-                    Text("Import Transactions")
-                }
+                .padding(.horizontal, 20)
+                .padding(.top, 24)
             }
-            .buttonStyle(.bordered)
-            .disabled(viewModel.isImporting)
-
-            if let institution = viewModel.linkedInstitutionName {
-                Text("Linked: \(institution)")
-                    .font(.subheadline)
-            }
-
-            if !viewModel.statusMessage.isEmpty {
-                Text(viewModel.statusMessage)
-                    .font(.footnote)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            }
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .padding()
         .tellerConnect(
             isPresented: $showTeller,
             config: Teller.Config(
@@ -70,4 +172,8 @@ struct BankLinkView: View {
             }
         )
     }
+}
+
+#Preview {
+    BankLinkView()
 }

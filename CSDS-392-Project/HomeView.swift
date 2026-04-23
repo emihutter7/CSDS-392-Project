@@ -27,7 +27,6 @@ struct HomeView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
-
                     Text("Home")
                         .font(.system(size: 32, weight: .semibold))
                         .foregroundStyle(secondaryAccent)
